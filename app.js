@@ -1,6 +1,6 @@
 // Configuration Setup
 const sheetId = '1fGmyoWkhOx_pgC-22gJTxtvreKdOAOyyZbeZ1tM71T4'; 
-const sheetName = 'Form Responses 1'; // Switch this to your active data sheet tab name
+const sheetName = 'leaderboard'; // Switch this to your active data sheet tab name
 const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
 
 // Track state selection
