@@ -3,18 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Leaderboard</title>
+    <title>E.ON Next Roadshow Leaderboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🏆 Live Leaderboard</h1>
-        <div id="leaderboard-container">
-            <div class="loading">Loading live scores...</div>
+    <div class="eon-container">
+        <!-- Brand Header -->
+        <div class="eon-header">
+            <img src="eon_next_logo.png" alt="E.ON Next" class="eon-logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
+            <div id="fallback-logo" class="eon-wordmark" style="display: none;">
+                <span class="eon-word-eon">e·on</span><span class="eon-word-next">next</span>
+            </div>
+            <div class="eon-title">Roadshow Leaderboard</div>
+            <div class="eon-sub">Live stall tournament tracking</div>
+        </div>
+
+        <!-- Card 1: All-Time Leaderboard -->
+        <div class="eon-card">
+            <div class="eon-step">🏆 All-Time Top Teams</div>
+            <div id="all-time-container">
+                <div class="loading">Loading standings...</div>
+            </div>
+        </div>
+
+        <!-- Card 2: Session Leaderboard -->
+        <div class="eon-card">
+            <div class="eon-step">🕒 Session Standings</div>
+            
+            <div class="filter-group">
+                <label for="session-select">Select Live Session:</label>
+                <select id="session-select">
+                    <option value="Day 1: 9:30am">Day 1 — 09:30</option>
+                    <option value="Day 1: 11:00am">Day 1 — 11:00</option>
+                    <option value="Day 1: 1:00pm">Day 1 — 13:00</option>
+                    <option value="Day 1: 2:30pm">Day 1 — 14:30</option>
+                    <option value="Day 2: 9:30am">Day 2 — 09:30</option>
+                    <option value="Day 2: 11:00am">Day 2 — 11:00</option>
+                    <option value="Day 2: 1:00pm">Day 2 — 13:00</option>
+                    <option value="Day 2: 2:30pm">Day 2 — 14:30</option>
+                </select>
+            </div>
+
+            <div id="session-container">
+                <div class="loading">Loading session data...</div>
+            </div>
         </div>
     </div>
-    
-    <!-- This line tells HTML to look at your separate app.js file -->
+
     <script src="app.js"></script>
 </body>
 </html>

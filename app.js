@@ -1,47 +1,82 @@
-// 1. Setup - Your specific Sheet ID and Tab Name
+// Configuration Setup
 const sheetId = '1fGmyoWkhOx_pgC-22gJTxtvreKdOAOyyZbeZ1tM71T4'; 
-const sheetName = 'leaderboard'; 
+const sheetName = 'Form Responses 1'; // Switch this to your active data sheet tab name
 const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
 
-function fetchLeaderboard() {
+// Track state selection
+const sessionSelect = document.getElementById('session-select');
+
+function cleanField(field) {
+    if (!field) return '';
+    return field.trim().replace(/^"|"$/g, '');
+}
+
+function generateTableHTML(dataList) {
+    if (dataList.length === 0) {
+        return '<p class="loading">No scores logged for this bracket yet.</p>';
+    }
+
+    let html = '<table class="leaderboard-table">';
+    html += '<tr><th>Rank</th><th>Team Name</th><th>Total Score (Max 40)</th></tr>';
+    
+    dataList.forEach((item, index) => {
+        html += `<tr>
+                    <td>#${index + 1}</td>
+                    <td>${item.name}</td>
+                    <td><strong>${item.score}</strong> / 40</td>
+                 </tr>`;
+    });
+    
+    html += '</table>';
+    return html;
+}
+
+function processLeaderboards() {
     fetch(url)
         .then(response => response.text())
         .then(csvText => {
-            // Split the CSV into rows
             const rows = csvText.split('\n');
-            rows.shift(); // Remove the first row (the Google Sheet headers)
+            rows.shift(); // Remove headers
             
-            // Start building the HTML table with headers
-            let html = '<table class="leaderboard-table">';
-            html += '<tr><th>Rank</th><th>Name</th><th>Score</th></tr>';
-            
-            rows.forEach((row, index) => {
-                if (!row.trim()) return; // Skip empty rows at the bottom
+            const allTeams = [];
+
+            rows.forEach(row => {
+                if (!row.trim()) return;
                 
-                const columns = row.split('","'); 
-                const name = columns[0].replace(/"/g, ''); 
-                const score = (columns[1] || '').replace(/"/g, ''); 
-                const rank = index + 1; // Auto-calculates rank based on row order
-                
-                // Append a new row for EVERY person in the loop
-                html += `<tr>
-                            <td>#${rank}</td>
-                            <td>${name}</td>
-                            <td>${score} pts</td>
-                         </tr>`;
+                // Match items split cleanly by commas while omitting structure wrappers
+                const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                if (columns.length < 4) return;
+
+                const session = cleanField(columns[1]);
+                const name = cleanField(columns[2]);
+                const score = parseInt(cleanField(columns[3])) || 0;
+
+                if(name) {
+                    allTeams.push({ session, name, score });
+                }
             });
-            
-            html += '</table>'; // Close the table tag after the loop finishes
-            document.getElementById('leaderboard-container').innerHTML = html;
+
+            // --- 1. Compute All-Time Leaderboard ---
+            const allTimeSorted = [...allTeams].sort((a, b) => b.score - a.score);
+            document.getElementById('all-time-container').innerHTML = generateTableHTML(allTimeSorted);
+
+            // --- 2. Compute Filtered Session Leaderboard ---
+            const currentSelectedSession = sessionSelect.value;
+            const sessionFiltered = allTeams.filter(team => team.session === currentSelectedSession);
+            const sessionSorted = sessionFiltered.sort((a, b) => b.score - a.score);
+            document.getElementById('session-container').innerHTML = generateTableHTML(sessionSorted);
         })
         .catch(error => {
-            console.error('Error fetching data:', error);
-            document.getElementById('leaderboard-container').innerHTML = '<p>Error loading leaderboard.</p>';
+            console.error('Error processing spreadsheet data:', error);
+            const errorMsg = '<p class="loading">Error synchronizing live scores.</p>';
+            document.getElementById('all-time-container').innerHTML = errorMsg;
+            document.getElementById('session-container').innerHTML = errorMsg;
         });
 }
 
-// Load immediately on page load
-fetchLeaderboard();
+// Event listener for interactive manual tracking adjustments
+sessionSelect.addEventListener('change', processLeaderboards);
 
-// Auto-refresh every 10 seconds (10000 milliseconds)
-setInterval(fetchLeaderboard, 10000);
+// Primary execution loop
+processLeaderboards();
+setInterval(processLeaderboards, 10000);
