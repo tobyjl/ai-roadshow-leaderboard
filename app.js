@@ -1,9 +1,11 @@
+// Configuration Setup - Updated Sheet ID and lowercase Tab Name
 const sheetId = '1fGmyoWkhOx_pgC-22gJTxtvreKdOAOyyZbeZ1tM71T4'; 
 const sheetName = 'leaderboard'; 
 const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
 
 let isAutoMode = true;
 
+// DOM Elements
 const sessionSelect = document.getElementById('session-select');
 const autoToggleBtn = document.getElementById('auto-toggle-btn');
 
@@ -38,7 +40,6 @@ function cleanField(field) {
     return field.trim().replace(/^"|"$/g, '');
 }
 
-// Generates table structure with the new Stalls column
 function generateTableHTML(dataList) {
     if (dataList.length === 0) {
         return '<p class="loading">No event scores recorded here yet.</p>';
@@ -77,24 +78,24 @@ function processLeaderboards() {
                 if (!row.trim()) return;
                 
                 const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                // Changed from < 4 to < 5 to safely handle Column E data
-                if (columns.length < 5) return;
+                if (columns.length < 4) return;
 
                 const session = cleanField(columns[1]);
                 const name = cleanField(columns[2]);
                 const score = parseInt(cleanField(columns[3])) || 0;
-                const stalls = cleanField(columns[4]); // Captures Column E string
+                // Graceful fallback if column E is unpopulated or missing trailing cell
+                const stalls = columns[4] ? cleanField(columns[4]) : '-';
 
                 if(name) {
                     allTeams.push({ session, name, score, stalls });
                 }
             });
 
-            // 1. All-Time
+            // 1. Process Global Standings (All-Time)
             const allTimeSorted = [...allTeams].sort((a, b) => b.score - a.score);
             document.getElementById('all-time-container').innerHTML = generateTableHTML(allTimeSorted);
 
-            // 2. Session
+            // 2. Process Session Specific View
             const targetSession = sessionSelect.value;
             const sessionFiltered = allTeams.filter(team => team.session === targetSession);
             const sessionSorted = sessionFiltered.sort((a, b) => b.score - a.score);

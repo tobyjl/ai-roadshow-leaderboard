@@ -1,7 +1,8 @@
+/* E.ON Next Design System Tokens */
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
     background-color: #faf6f4 !important; /* Birch */
-    color: #4a4a4a;
+    color: #4a4a4a; /* Grey VDark */
     display: flex;
     justify-content: center;
     padding: 40px 24px;
@@ -10,7 +11,7 @@ body {
 
 .eon-container {
     width: 100%;
-    max-width: 1100px; /* Wider footprint to fit multi-columns */
+    max-width: 1100px;
 }
 
 /* Header & Typography */
@@ -25,12 +26,12 @@ body {
 /* Dashboard Grid Positioning */
 .leaderboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Equal side-by-side widths */
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
 }
 
-@media (max-width: 800px) {
-    .leaderboard-grid { grid-template-columns: 1fr; } /* Stack on smaller viewports */
+@media (max-width: 900px) {
+    .leaderboard-grid { grid-template-columns: 1fr; }
 }
 
 .eon-card {
@@ -41,7 +42,7 @@ body {
 }
 
 .eon-step {
-    color: #36164a !important;
+    color: #36164a !important; /* Purple Dark */
     font-weight: 700;
     font-size: 20px;
     margin-bottom: 20px;
@@ -71,7 +72,7 @@ body {
     background: #ffffff;
     color: #36164a;
     border: 2px solid #36164a;
-    border-radius: 100px !important; /* Pill profile */
+    border-radius: 100px !important;
     padding: 10px 20px;
     font-weight: 700;
     font-size: 14px;
@@ -80,7 +81,7 @@ body {
 }
 
 .eon-toggle-btn.active {
-    background: #36164a !important; /* Dark Purple selection state */
+    background: #36164a !important;
     color: #ffffff !important;
     border-color: #36164a !important;
 }
@@ -96,22 +97,26 @@ select {
 }
 select:disabled { background: #f6f0ed !important; color: #7e6787 !important; cursor: not-allowed; }
 
-/* Style for Stalls Visited String Column */
-.stall-badge {
-    background-color: #f6f0ed; /* Birch Tint */
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-weight: 700;
-    color: #36164a; /* Purple Dark */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.9rem;
-}
-
 /* Standings Displays */
 .leaderboard-table { width: 100%; border-collapse: collapse; }
 .leaderboard-table th, .leaderboard-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f6f0ed; }
 .leaderboard-table th { background-color: #faf6f4; font-weight: 700; color: #7e6787; text-transform: uppercase; font-size: 0.75rem; }
+
+/* Highlight Winner Podium Spot */
 .leaderboard-table tr:nth-child(2) { background-color: rgba(255, 72, 34, 0.05); font-weight: 700; }
 .leaderboard-table tr:nth-child(2) td:first-child { color: #ff4822; }
+
 .loading { text-align: center; color: #7e6787; font-style: italic; padding: 20px 0; }
+
+/* Stalls Badge */
+.stall-badge {
+    background-color: #faf6f4;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    color: #36164a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    border: 1px solid #dfd3d9;
+}
