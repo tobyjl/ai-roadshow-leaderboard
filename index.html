@@ -14,38 +14,56 @@
             <div id="fallback-logo" class="eon-wordmark" style="display: none;">
                 <span class="eon-word-eon">e·on</span><span class="eon-word-next">next</span>
             </div>
-            <div class="eon-title">Roadshow Leaderboard</div>
-            <div class="eon-sub">Live stall tournament tracking</div>
+            <div class="eon-title">Roadshow Live Tournament</div>
+            <div class="eon-sub">Real-time team performance tracking across all stalls</div>
         </div>
 
-        <!-- Card 1: All-Time Leaderboard -->
-        <div class="eon-card">
-            <div class="eon-step">🏆 All-Time Top Teams</div>
-            <div id="all-time-container">
-                <div class="loading">Loading standings...</div>
-            </div>
-        </div>
-
-        <!-- Card 2: Session Leaderboard -->
-        <div class="eon-card">
-            <div class="eon-step">🕒 Session Standings</div>
-            
+        <!-- Mode Controls -->
+        <div class="controls-card">
+            <button id="auto-toggle-btn" class="eon-toggle-btn active">🔄 Auto-Detect Session</button>
             <div class="filter-group">
-                <label for="session-select">Select Live Session:</label>
-                <select id="session-select">
+                <label for="session-select">Active Bracket:</label>
+                <select id="session-select" disabled>
+                    <!-- Day 1 (July 13) -->
                     <option value="Day 1: 9:30am">Day 1 — 09:30</option>
                     <option value="Day 1: 11:00am">Day 1 — 11:00</option>
                     <option value="Day 1: 1:00pm">Day 1 — 13:00</option>
                     <option value="Day 1: 2:30pm">Day 1 — 14:30</option>
+                    <!-- Day 2 (July 14) -->
                     <option value="Day 2: 9:30am">Day 2 — 09:30</option>
                     <option value="Day 2: 11:00am">Day 2 — 11:00</option>
                     <option value="Day 2: 1:00pm">Day 2 — 13:00</option>
                     <option value="Day 2: 2:30pm">Day 2 — 14:30</option>
+                    <!-- Day 3 (July 15) -->
+                    <option value="Day 3: 9:30am">Day 3 — 09:30</option>
+                    <option value="Day 3: 11:00am">Day 3 — 11:00</option>
+                    <option value="Day 3: 1:00pm">Day 3 — 13:00</option>
+                    <option value="Day 3: 2:30pm">Day 3 — 14:30</option>
+                    <!-- Day 4 (July 16) -->
+                    <option value="Day 4: 9:30am">Day 4 — 09:30</option>
+                    <option value="Day 4: 11:00am">Day 4 — 11:00</option>
+                    <option value="Day 4: 1:00pm">Day 4 — 13:00</option>
+                    <option value="Day 4: 2:30pm">Day 4 — 14:30</option>
                 </select>
             </div>
+        </div>
 
-            <div id="session-container">
-                <div class="loading">Loading session data...</div>
+        <!-- Dual Leaderboard Grid Layout -->
+        <div class="leaderboard-grid">
+            <!-- Left Column: Session -->
+            <div class="eon-card">
+                <div class="eon-step">🕒 Current Session Standings</div>
+                <div id="session-container">
+                    <div class="loading">Loading current session...</div>
+                </div>
+            </div>
+
+            <!-- Right Column: All-Time -->
+            <div class="eon-card">
+                <div class="eon-step">🏆 All-Time Top Teams</div>
+                <div id="all-time-container">
+                    <div class="loading">Loading tournament standings...</div>
+                </div>
             </div>
         </div>
     </div>
