@@ -1,5 +1,5 @@
 const sheetId = '1fGmyoWkhOx_pgC-22gJTxtvreKdOAOyyZbeZ1tM71T4'; 
-const sheetName = 'Form Responses 1'; 
+const sheetName = 'leaderboard'; 
 const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
 
 let isAutoMode = true;
