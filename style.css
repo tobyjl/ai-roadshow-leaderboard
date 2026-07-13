@@ -96,6 +96,18 @@ select {
 }
 select:disabled { background: #f6f0ed !important; color: #7e6787 !important; cursor: not-allowed; }
 
+/* Style for Stalls Visited String Column */
+.stall-badge {
+    background-color: #f6f0ed; /* Birch Tint */
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    color: #36164a; /* Purple Dark */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
 /* Standings Displays */
 .leaderboard-table { width: 100%; border-collapse: collapse; }
 .leaderboard-table th, .leaderboard-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f6f0ed; }
