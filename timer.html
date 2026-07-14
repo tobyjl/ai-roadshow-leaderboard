@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E.ON Next Roadshow — Live Timer</title>
+    <link rel="stylesheet" href="timer.css">
+</head>
+<body class="phase-idle">
+    <!-- Full-screen flash overlay for phase changes -->
+    <div id="flash-overlay" class="flash-overlay"></div>
+
+    <div class="timer-layout">
+        <!-- Slim brand header -->
+        <header class="timer-header">
+            <img src="eon_next_logo.png" alt="E.ON Next" class="timer-logo" onerror="this.style.display='none'">
+            <div class="timer-header-title">Roadshow Live</div>
+        </header>
+
+        <main class="timer-main">
+            <!-- LEFT: The big timer -->
+            <section class="timer-stage">
+                <div id="phase-label" class="phase-label">Ready to start</div>
+                <div id="phase-sub" class="phase-sub">4 rounds · 10:00 at each stall · 1:30 to rotate</div>
+
+                <div id="clock" class="clock">44:30</div>
+
+                <!-- Per-team assignments: stall occupancy during a round, or moves during transit -->
+                <div id="assignments" class="assignments"></div>
+
+                <!-- Journey progress: 4 rounds linked by 3 rotations -->
+                <div class="journey" id="journey">
+                    <div class="stop" data-phase="0"><span class="stop-dot">1</span><span class="stop-name">Round 1</span></div>
+                    <div class="leg" data-phase="1"></div>
+                    <div class="stop" data-phase="2"><span class="stop-dot">2</span><span class="stop-name">Round 2</span></div>
+                    <div class="leg" data-phase="3"></div>
+                    <div class="stop" data-phase="4"><span class="stop-dot">3</span><span class="stop-name">Round 3</span></div>
+                    <div class="leg" data-phase="5"></div>
+                    <div class="stop" data-phase="6"><span class="stop-dot">4</span><span class="stop-name">Round 4</span></div>
+                </div>
+
+                <div id="overall" class="overall">Total run 44:30</div>
+
+                <!-- Operator controls -->
+                <div class="controls">
+                    <button id="start-btn" class="ctrl ctrl-primary">▶ Start</button>
+                    <button id="reset-btn" class="ctrl ctrl-ghost">↺ Reset</button>
+                    <button id="skip-btn" class="ctrl ctrl-ghost">⏭ Skip</button>
+                </div>
+                <div class="hint">Spacebar = start / pause</div>
+            </section>
+
+            <!-- RIGHT: Live current-session leaderboard -->
+            <aside class="side-board">
+                <div class="side-title">🕒 Current Session</div>
+                <div id="side-session" class="side-session">—</div>
+                <div id="side-container">
+                    <div class="loading">Loading standings…</div>
+                </div>
+                <div id="side-updated" class="side-updated">Last updated: —</div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="schedule.js"></script>
+    <script src="timer.js"></script>
+</body>
+</html>

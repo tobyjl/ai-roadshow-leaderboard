@@ -24,28 +24,20 @@
             <div class="filter-group">
                 <label for="session-select">Active Bracket:</label>
                 <select id="session-select" disabled>
-                    <!-- Day 1 (July 13) -->
-                    <option value="Day 1: 9:30am">Day 1 — 09:30</option>
-                    <option value="Day 1: 11:00am">Day 1 — 11:00</option>
-                    <option value="Day 1: 1:00pm">Day 1 — 13:00</option>
-                    <option value="Day 1: 2:30pm">Day 1 — 14:30</option>
-                    <!-- Day 2 (July 14) -->
-                    <option value="Day 2: 9:30am">Day 2 — 09:30</option>
-                    <option value="Day 2: 11:00am">Day 2 — 11:00</option>
-                    <option value="Day 2: 1:00pm">Day 2 — 13:00</option>
-                    <option value="Day 2: 2:30pm">Day 2 — 14:30</option>
-                    <!-- Day 3 (July 15) -->
-                    <option value="Day 3: 9:30am">Day 3 — 09:30</option>
-                    <option value="Day 3: 11:00am">Day 3 — 11:00</option>
-                    <option value="Day 3: 1:00pm">Day 3 — 13:00</option>
-                    <option value="Day 3: 2:30pm">Day 3 — 14:30</option>
-                    <!-- Day 4 (July 16) -->
-                    <option value="Day 4: 9:30am">Day 4 — 09:30</option>
-                    <option value="Day 4: 11:00am">Day 4 — 11:00</option>
-                    <option value="Day 4: 1:00pm">Day 4 — 13:00</option>
-                    <option value="Day 4: 2:30pm">Day 4 — 14:30</option>
+                    <!-- Day 1 (July 15) -->
+                    <option value="Day 1: 9:30am">Day 1 — Session 1 · 09:30</option>
+                    <option value="Day 1: 11:00am">Day 1 — Session 2 · 11:00</option>
+                    <option value="Day 1: 1:00pm">Day 1 — Session 3 · 13:00</option>
+                    <option value="Day 1: 2:30pm">Day 1 — Session 4 · 14:30</option>
+                    <!-- Day 2 (July 16) -->
+                    <option value="Day 2: 9:30am">Day 2 — Session 1 · 09:30</option>
+                    <option value="Day 2: 11:00am">Day 2 — Session 2 · 11:00</option>
+                    <option value="Day 2: 1:00pm">Day 2 — Session 3 · 13:00</option>
+                    <option value="Day 2: 2:30pm">Day 2 — Session 4 · 14:30</option>
                 </select>
             </div>
+            <a href="timer.html" class="timer-link">⏱ Open Live Timer</a>
+            <div id="last-updated" class="last-updated">Last updated: —</div>
         </div>
 
         <!-- Dual Leaderboard Grid Layout -->
@@ -68,6 +60,7 @@
         </div>
     </div>
 
+    <script src="schedule.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,339 @@
+/* ============================================================
+   E.ON Next Roadshow — Fullscreen Live Timer
+   Design tokens: Birch #faf6f4 · Orange #ff4822 · Purple #36164a
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #faf6f4;
+    color: #36164a;
+}
+
+/* Phase-driven background themes (smoothly transitioned) */
+body {
+    transition: background 600ms ease;
+}
+body.phase-idle     { background: #faf6f4; }
+body.phase-stall    { background: radial-gradient(circle at 30% 20%, #4a2263 0%, #36164a 70%); color: #ffffff; }
+body.phase-transit  { background: radial-gradient(circle at 30% 20%, #ff6a47 0%, #ff4822 70%); color: #ffffff; }
+body.phase-finished { background: radial-gradient(circle at 30% 20%, #2f9e6f 0%, #1f7d57 70%); color: #ffffff; }
+
+/* ---------- Layout ---------- */
+.timer-layout {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(12px, 2vh, 28px) clamp(16px, 2.5vw, 40px);
+}
+
+.timer-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 0 0 auto;
+}
+.timer-logo { height: clamp(28px, 4vh, 46px); }
+.timer-header-title {
+    font-weight: 800;
+    font-size: clamp(16px, 2.2vh, 26px);
+    letter-spacing: -0.5px;
+    opacity: 0.9;
+}
+
+.timer-main {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: clamp(16px, 2vw, 36px);
+    min-height: 0;
+    align-items: stretch;
+}
+
+/* ---------- Timer stage ---------- */
+.timer-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 0;
+}
+
+.phase-label {
+    font-size: clamp(28px, 6vh, 64px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+    text-transform: uppercase;
+}
+.phase-sub {
+    margin-top: 8px;
+    font-size: clamp(14px, 2.2vh, 22px);
+    opacity: 0.75;
+    font-weight: 600;
+}
+
+.clock {
+    font-size: clamp(90px, 26vh, 320px);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -4px;
+    font-variant-numeric: tabular-nums;
+    margin: clamp(6px, 1.5vh, 24px) 0;
+}
+/* Urgent pulse on the clock in the final 10s of any phase */
+.clock.ending { animation: clockPulse 1s ease-in-out infinite; }
+@keyframes clockPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.04); opacity: 0.7; }
+}
+
+/* ---------- Journey progress ---------- */
+.journey {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: clamp(10px, 2vh, 26px);
+}
+.stop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+.stop-dot {
+    width: clamp(34px, 5vh, 54px);
+    height: clamp(34px, 5vh, 54px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: clamp(16px, 2.4vh, 24px);
+    border: 3px solid currentColor;
+    opacity: 0.4;
+    transition: 300ms;
+}
+.stop-name {
+    font-size: clamp(11px, 1.5vh, 15px);
+    font-weight: 700;
+    opacity: 0.4;
+    transition: 300ms;
+}
+.leg {
+    flex: 1 1 auto;
+    height: 4px;
+    background: currentColor;
+    opacity: 0.25;
+    margin: 0 6px;
+    margin-bottom: 22px;
+    border-radius: 2px;
+    transition: 300ms;
+}
+/* Completed */
+.stop.done .stop-dot, .stop.done .stop-name { opacity: 0.85; }
+.leg.done { opacity: 0.7; }
+/* Active */
+.stop.active .stop-dot {
+    opacity: 1;
+    background: currentColor;
+    color: #36164a;
+    transform: scale(1.12);
+    box-shadow: 0 0 0 6px rgba(255,255,255,0.18);
+}
+body.phase-transit .stop.active .stop-dot { color: #ff4822; }
+.stop.active .stop-name { opacity: 1; }
+.leg.active { opacity: 1; animation: legFlow 1.2s ease-in-out infinite; }
+@keyframes legFlow {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+}
+
+/* ---------- Per-team assignments ---------- */
+.assignments {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(8px, 1.2vw, 16px);
+    width: 100%;
+    max-width: 1000px;
+    margin: clamp(6px, 1.4vh, 18px) 0 clamp(10px, 1.8vh, 22px);
+}
+.assign-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: clamp(8px, 1.4vh, 14px) clamp(12px, 1.6vw, 22px);
+    border-radius: 100px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.28);
+    white-space: nowrap;
+}
+.assign-chip .chip-team {
+    font-weight: 800;
+    font-size: clamp(15px, 2.2vh, 26px);
+}
+.assign-chip .chip-stall {
+    font-weight: 700;
+    font-size: clamp(12px, 1.7vh, 19px);
+    opacity: 0.85;
+}
+.assign-chip.stall .chip-stall {
+    background: rgba(255,255,255,0.18);
+    padding: 2px 10px;
+    border-radius: 8px;
+    opacity: 1;
+}
+.assign-chip .chip-arrow {
+    font-size: clamp(16px, 2.4vh, 28px);
+    font-weight: 800;
+    opacity: 0.9;
+}
+/* Transit moves are the key info — make them pop */
+.assign-chip.move {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+}
+.assign-chip.move .chip-stall {
+    background: #ffffff;
+    color: #ff4822;
+    padding: 3px 12px;
+    border-radius: 8px;
+    opacity: 1;
+    font-weight: 800;
+}
+/* Light idle background needs dark chip text */
+body.phase-idle .assign-chip {
+    background: rgba(54,22,74,0.06);
+    border-color: rgba(54,22,74,0.16);
+    color: #36164a;
+}
+body.phase-idle .assign-chip.stall .chip-stall {
+    background: rgba(54,22,74,0.1);
+}
+
+.overall {
+    font-size: clamp(14px, 2vh, 22px);
+    font-weight: 700;
+    opacity: 0.7;
+    margin-bottom: clamp(12px, 2vh, 24px);
+}
+
+/* ---------- Controls ---------- */
+.controls { display: flex; gap: 14px; }
+.ctrl {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: clamp(14px, 2vh, 20px);
+    padding: clamp(10px, 1.5vh, 16px) clamp(20px, 3vw, 36px);
+    border-radius: 100px;
+    cursor: pointer;
+    transition: 150ms;
+    border: 2px solid currentColor;
+}
+.ctrl-primary {
+    background: #ffffff;
+    color: #36164a;
+    border-color: #ffffff;
+}
+.ctrl-primary:hover { transform: translateY(-2px); }
+.ctrl-ghost {
+    background: transparent;
+    color: currentColor;
+    opacity: 0.85;
+}
+.ctrl-ghost:hover { opacity: 1; background: rgba(255,255,255,0.12); }
+body.phase-idle .ctrl-ghost { border-color: #36164a; }
+body.phase-idle .ctrl-primary { background: #36164a; color: #fff; border-color: #36164a; }
+
+.hint {
+    margin-top: 12px;
+    font-size: clamp(11px, 1.4vh, 14px);
+    opacity: 0.5;
+    font-weight: 600;
+}
+
+/* ---------- Side leaderboard ---------- */
+.side-board {
+    background: rgba(255,255,255,0.96);
+    color: #36164a;
+    border-radius: 22px;
+    padding: clamp(16px, 2.5vh, 30px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+.side-title {
+    font-weight: 800;
+    font-size: clamp(18px, 2.6vh, 28px);
+    color: #36164a;
+}
+.side-session {
+    font-size: clamp(13px, 1.8vh, 18px);
+    font-weight: 700;
+    color: #ff4822;
+    margin: 4px 0 14px;
+}
+#side-container { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+
+.leaderboard-table { width: 100%; border-collapse: collapse; }
+.leaderboard-table th, .leaderboard-table td {
+    padding: clamp(8px, 1.4vh, 14px) 10px;
+    text-align: left;
+    border-bottom: 1px solid #f0e8ec;
+    font-size: clamp(14px, 2vh, 20px);
+}
+.leaderboard-table th {
+    color: #7e6787;
+    text-transform: uppercase;
+    font-size: clamp(10px, 1.3vh, 13px);
+    letter-spacing: 0.5px;
+}
+.leaderboard-table tr:nth-child(2) { background: rgba(255,72,34,0.06); font-weight: 800; }
+.leaderboard-table tr:nth-child(2) td:first-child { color: #ff4822; }
+.stall-badge {
+    background: #faf6f4;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.8em;
+    border: 1px solid #dfd3d9;
+}
+.loading { text-align: center; color: #7e6787; font-style: italic; padding: 20px 0; }
+.side-updated {
+    margin-top: 12px;
+    font-size: clamp(11px, 1.4vh, 14px);
+    color: #7e6787;
+    text-align: right;
+}
+.side-updated.stale { color: #ff4822; font-weight: 700; }
+
+/* ---------- Full-screen flash on phase change ---------- */
+.flash-overlay {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+}
+.flash-overlay.fire { animation: flashFire 700ms ease-out; }
+@keyframes flashFire {
+    0%   { opacity: 0.85; }
+    100% { opacity: 0; }
+}
+
+/* Stack the side board under the timer on very narrow / portrait screens */
+@media (max-width: 900px), (max-aspect-ratio: 1/1) {
+    .timer-main { grid-template-columns: 1fr; grid-template-rows: 1.4fr 1fr; }
+}

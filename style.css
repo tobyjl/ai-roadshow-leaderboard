@@ -67,6 +67,21 @@ body {
 .filter-group { display: flex; align-items: center; gap: 12px; }
 .filter-group label { font-weight: 700; color: #36164a; }
 
+.last-updated { font-size: 13px; color: #7e6787; }
+.last-updated.stale { color: #ff4822; font-weight: 700; }
+
+.timer-link {
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    color: #ffffff;
+    background: #ff4822;
+    padding: 10px 18px;
+    border-radius: 100px;
+    transition: 150ms;
+}
+.timer-link:hover { background: #e13d1c; }
+
 /* Buttons & Inputs */
 .eon-toggle-btn {
     background: #ffffff;
