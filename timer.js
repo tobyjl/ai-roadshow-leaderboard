@@ -335,7 +335,7 @@ function refreshBoard() {
                 const name = cleanField(cols[2]);
                 const score = parseInt(cleanField(cols[3])) || 0;
                 const stalls = cols[4] ? cleanField(cols[4]) : '-';
-                if (name && session === target) teams.push({ name, score, stalls });
+                if (name && session === target && !isTestEntry(name)) teams.push({ name, score, stalls });
             });
             teams.sort((a, b) => b.score - a.score);
             sideContainer.innerHTML = renderBoard(teams);

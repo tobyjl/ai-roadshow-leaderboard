@@ -100,3 +100,8 @@ function cleanField(field) {
     if (!field) return '';
     return field.trim().replace(/^"|"$/g, '');
 }
+
+// Test/placeholder rows — any team name containing "TEST" (case-insensitive).
+function isTestEntry(name) {
+    return (name || '').trim().toUpperCase().includes('TEST');
+}

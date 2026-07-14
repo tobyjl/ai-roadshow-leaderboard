@@ -8,9 +8,18 @@ let isAutoMode = true;
 // DOM Elements
 const sessionSelect = document.getElementById('session-select');
 const autoToggleBtn = document.getElementById('auto-toggle-btn');
+const testToggleBtn = document.getElementById('test-toggle-btn');
 const lastUpdatedEl = document.getElementById('last-updated');
 
 let lastSuccessTime = null;
+
+// Hide test entries by default; remember the operator's choice across refreshes.
+let hideTests = localStorage.getItem('hideTests') !== 'false';
+
+function syncTestToggle() {
+    testToggleBtn.classList.toggle('active', hideTests);
+    testToggleBtn.innerText = hideTests ? '🧹 Hide Test Entries' : '👁 Show Test Entries';
+}
 
 function formatTime(date) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -69,13 +78,18 @@ function processLeaderboards() {
                 }
             });
 
+            // Optionally strip test/placeholder rows from the view.
+            const visibleTeams = hideTests
+                ? allTeams.filter(team => !isTestEntry(team.name))
+                : allTeams;
+
             // 1. Process Global Standings (All-Time)
-            const allTimeSorted = [...allTeams].sort((a, b) => b.score - a.score);
+            const allTimeSorted = [...visibleTeams].sort((a, b) => b.score - a.score);
             document.getElementById('all-time-container').innerHTML = generateTableHTML(allTimeSorted);
 
             // 2. Process Session Specific View
             const targetSession = sessionSelect.value;
-            const sessionFiltered = allTeams.filter(team => team.session === targetSession);
+            const sessionFiltered = visibleTeams.filter(team => team.session === targetSession);
             const sessionSorted = sessionFiltered.sort((a, b) => b.score - a.score);
             document.getElementById('session-container').innerHTML = generateTableHTML(sessionSorted);
 
@@ -105,7 +119,15 @@ autoToggleBtn.addEventListener('click', () => {
     processLeaderboards();
 });
 
+testToggleBtn.addEventListener('click', () => {
+    hideTests = !hideTests;
+    localStorage.setItem('hideTests', hideTests);
+    syncTestToggle();
+    processLeaderboards();
+});
+
 sessionSelect.addEventListener('change', processLeaderboards);
 
+syncTestToggle();
 processLeaderboards();
 setInterval(processLeaderboards, 15000);
