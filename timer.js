@@ -39,6 +39,7 @@ const skipBtn     = document.getElementById('skip-btn');
 const flashEl     = document.getElementById('flash-overlay');
 const journeyEl   = document.getElementById('journey');
 const assignEl    = document.getElementById('assignments');
+const missingEl   = document.getElementById('missing-flag');
 
 // ============================================================
 //  Time helpers
@@ -133,6 +134,14 @@ function isIdle() {
         && remainingMs === PHASES[0].duration * 1000;
 }
 
+// How many stall-rounds are fully finished at the current phase (0–4).
+function completedRounds() {
+    if (finished) return 4;
+    if (isIdle()) return 0;
+    const p = PHASES[phaseIndex];
+    return p.type === 'stall' ? p.stall - 1 : (phaseIndex + 1) / 2;
+}
+
 function updateDisplay() {
     bodyEl.className = phaseThemeClass();
 
@@ -170,6 +179,40 @@ function updateDisplay() {
     startBtn.textContent = isRunning ? '⏸ Pause' : (phaseEndTime === null ? '▶ Start' : '▶ Resume');
     updateJourney();
     renderAssignments();
+    renderMissingFlag();
+}
+
+// Per-team codes for the active session, kept fresh by refreshBoard() below.
+let sessionCodes = {};
+let lastMissingHtml = null;
+
+// Flag teams that should have a stall scored by now (based on completed rounds) but don't.
+function renderMissingFlag() {
+    if (!missingEl) return;
+    const teams = getRosterForActive();
+    const done = completedRounds();
+    const missing = [];
+
+    for (let i = 0; i < 4; i++) {
+        const codes = sessionCodes[teams[i].trim().toLowerCase()] || [];
+        for (let r = 0; r < done; r++) {
+            const code = expectedCode(i, r);
+            if (!codes.includes(code)) {
+                missing.push({ team: teams[i], stall: ((i + r) % 4) + 1, code });
+            }
+        }
+    }
+
+    const html = missing.length === 0
+        ? ''
+        : `<div class="missing-title">⚠ Missing scores</div>` +
+          missing.map(m => `<div class="missing-item">${m.team} · <strong>Stall ${m.stall}</strong> (${m.code})</div>`).join('');
+
+    if (html !== lastMissingHtml) {
+        missingEl.innerHTML = html;
+        missingEl.classList.toggle('has-missing', missing.length > 0);
+        lastMissingHtml = html;
+    }
 }
 
 // Per-team panel: stall occupancy during a round, per-team moves during a rotation.
@@ -298,13 +341,31 @@ function clockTime(d) {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function renderBoard(rows) {
+function renderBoard(rows, revealed) {
     if (rows.length === 0) {
         return '<p class="loading">No scores recorded for this session yet.</p>';
     }
-    let html = '<table class="leaderboard-table">';
-    html += '<tr><th>Rank</th><th>Team</th><th>Score</th><th>Stalls</th></tr>';
-    rows.forEach((item, i) => {
+
+    if (!revealed) {
+        // Suspense: show progress, not scores, until the operator reveals.
+        const byName = [...rows].sort((a, b) => a.name.localeCompare(b.name));
+        let html = '<table class="leaderboard-table"><tr><th>Team</th><th>Status</th><th>Stalls</th></tr>';
+        byName.forEach(item => {
+            const status = item.complete
+                ? '<span class="pending ready">🔒 Ready</span>'
+                : `<span class="pending">${item.codes.length} / 4</span>`;
+            html += `<tr>
+                <td>${item.name}</td>
+                <td>${status}</td>
+                <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+            </tr>`;
+        });
+        return html + '</table>';
+    }
+
+    const ranked = [...rows].sort((a, b) => b.score - a.score);
+    let html = '<table class="leaderboard-table"><tr><th>Rank</th><th>Team</th><th>Score</th><th>Stalls</th></tr>';
+    ranked.forEach((item, i) => {
         html += `<tr>
             <td>#${i + 1}</td>
             <td>${item.name}</td>
@@ -312,8 +373,7 @@ function renderBoard(rows) {
             <td><span class="stall-badge">${item.stalls || '-'}</span></td>
         </tr>`;
     });
-    html += '</table>';
-    return html;
+    return html + '</table>';
 }
 
 function refreshBoard() {
@@ -327,6 +387,7 @@ function refreshBoard() {
             const rows = csv.split('\n');
             rows.shift();
             const teams = [];
+            const codesByName = {};
             rows.forEach(row => {
                 if (!row.trim()) return;
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -335,10 +396,15 @@ function refreshBoard() {
                 const name = cleanField(cols[2]);
                 const score = parseInt(cleanField(cols[3])) || 0;
                 const stalls = cols[4] ? cleanField(cols[4]) : '-';
-                if (name && session === target && !isTestEntry(name)) teams.push({ name, score, stalls });
+                if (name && session === target && !isTestEntry(name)) {
+                    const codes = parseVisited(stalls);
+                    codesByName[name.trim().toLowerCase()] = codes;
+                    teams.push({ name, score, stalls, codes, complete: hasAllStalls(codes) });
+                }
             });
-            teams.sort((a, b) => b.score - a.score);
-            sideContainer.innerHTML = renderBoard(teams);
+            sessionCodes = codesByName;
+            sideContainer.innerHTML = renderBoard(teams, isRevealed(target));
+            renderMissingFlag();
 
             lastBoardSuccess = new Date();
             sideUpdated.textContent = `Last updated: ${clockTime(lastBoardSuccess)}`;

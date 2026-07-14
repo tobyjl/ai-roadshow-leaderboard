@@ -105,3 +105,47 @@ function cleanField(field) {
 function isTestEntry(name) {
     return (name || '').trim().toUpperCase().includes('TEST');
 }
+
+/* ---- Stall visit codes ----
+   The sheet's "Stalls Visited" cell is a ", "-separated list of codes.
+   Stall 1 = C, Stall 2 = G, Stall 3 = N, Stall 4 = H. */
+const STALL_CODES = ['C', 'G', 'N', 'H'];
+
+// Parse "C, H, N" → ['C','H','N'] (upper-cased, de-duped).
+function parseVisited(str) {
+    const seen = cleanField(str).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    return [...new Set(seen)];
+}
+
+// True once a team has visited all four stalls.
+function hasAllStalls(codes) {
+    return STALL_CODES.every(c => codes.includes(c));
+}
+
+// Stall code a team (0-indexed) is expected to have scored for a given round (0-indexed).
+function expectedCode(teamIndex, roundIndex) {
+    return STALL_CODES[(teamIndex + roundIndex) % 4];
+}
+
+// Reverse a "Day N: <slot>" session string back to its roster.
+function parseSessionString(session) {
+    const m = /^Day\s+(\d+):\s*(.+)$/.exec((session || '').trim());
+    if (!m) return null;
+    const dayNum = parseInt(m[1], 10);
+    const slot = m[2].trim();
+    const s = SESSION_SLOTS.find(x => x.slot === slot);
+    return s ? { dayNum, sessionNum: s.sessionNum } : null;
+}
+
+function rosterForSessionString(session) {
+    const p = parseSessionString(session);
+    return (p && ROSTER[p.dayNum] && ROSTER[p.dayNum][p.sessionNum]) || null;
+}
+
+// Reveal state is per-session, remembered locally (single-machine setup).
+function isRevealed(session) {
+    return localStorage.getItem('reveal:' + session) === 'true';
+}
+function setRevealed(session, val) {
+    localStorage.setItem('reveal:' + session, val ? 'true' : 'false');
+}

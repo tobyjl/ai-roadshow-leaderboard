@@ -82,6 +82,22 @@ body {
 }
 .timer-link:hover { background: #e13d1c; }
 
+/* Reveal button — stands out as the "showtime" control */
+.reveal-btn { border-color: #ff4822; color: #ff4822; }
+.reveal-btn.active { background: #ff4822 !important; color: #fff !important; border-color: #ff4822 !important; }
+
+/* Pre-reveal suspense state */
+.pending { font-weight: 700; color: #7e6787; }
+.pending.ready { color: #ff4822; }
+
+/* Dramatic reveal: rows rise & fade in, ranked from the bottom up */
+.leaderboard-table.revealing tr { animation: revealRow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.leaderboard-table.revealing th { animation: none; }
+@keyframes revealRow {
+    from { opacity: 0; transform: translateY(18px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+}
+
 /* Buttons & Inputs */
 .eon-toggle-btn {
     background: #ffffff;

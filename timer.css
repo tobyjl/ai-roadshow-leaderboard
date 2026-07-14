@@ -318,6 +318,30 @@ body.phase-idle .ctrl-primary { background: #36164a; color: #fff; border-color: 
 }
 .side-updated.stale { color: #ff4822; font-weight: 700; }
 
+/* Missing-scores flag */
+.missing-flag { margin-bottom: 12px; }
+.missing-flag.has-missing {
+    background: #fff3f0;
+    border: 1px solid #ffb7a6;
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+.missing-title {
+    font-weight: 800;
+    color: #ff4822;
+    font-size: clamp(13px, 1.7vh, 17px);
+    margin-bottom: 4px;
+}
+.missing-item {
+    font-size: clamp(12px, 1.5vh, 15px);
+    color: #7a2a19;
+    line-height: 1.5;
+}
+
+/* Suspense state on the side board */
+.pending { font-weight: 700; color: #7e6787; }
+.pending.ready { color: #ff4822; }
+
 /* ---------- Full-screen flash on phase change ---------- */
 .flash-overlay {
     position: fixed;

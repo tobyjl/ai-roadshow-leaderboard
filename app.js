@@ -9,9 +9,12 @@ let isAutoMode = true;
 const sessionSelect = document.getElementById('session-select');
 const autoToggleBtn = document.getElementById('auto-toggle-btn');
 const testToggleBtn = document.getElementById('test-toggle-btn');
+const revealBtn = document.getElementById('reveal-btn');
 const lastUpdatedEl = document.getElementById('last-updated');
 
 let lastSuccessTime = null;
+// Set to a session string for one render after Reveal is clicked, to trigger the animation.
+let justRevealed = null;
 
 // Hide test entries by default; remember the operator's choice across refreshes.
 let hideTests = localStorage.getItem('hideTests') !== 'false';
@@ -19,6 +22,13 @@ let hideTests = localStorage.getItem('hideTests') !== 'false';
 function syncTestToggle() {
     testToggleBtn.classList.toggle('active', hideTests);
     testToggleBtn.innerText = hideTests ? '🧹 Hide Test Entries' : '👁 Show Test Entries';
+}
+
+// isRevealed / setRevealed live in schedule.js (shared with the timer page).
+function syncRevealBtn() {
+    const revealed = isRevealed(sessionSelect.value);
+    revealBtn.classList.toggle('active', revealed);
+    revealBtn.innerText = revealed ? '🙈 Hide Scores Again' : '🎭 Reveal Scores';
 }
 
 function formatTime(date) {
@@ -34,7 +44,7 @@ function generateTableHTML(dataList) {
 
     let html = '<table class="leaderboard-table">';
     html += '<tr><th>Rank</th><th>Team Name</th><th>Score</th><th>Stalls</th></tr>';
-    
+
     dataList.forEach((item, index) => {
         html += `<tr>
                     <td>#${index + 1}</td>
@@ -43,9 +53,70 @@ function generateTableHTML(dataList) {
                     <td><span class="stall-badge">${item.stalls || '-'}</span></td>
                  </tr>`;
     });
-    
+
     html += '</table>';
     return html;
+}
+
+// Current-session panel: scores hidden until Reveal, then a dramatic reveal.
+function generateSessionHTML(dataList, revealed, animate) {
+    if (dataList.length === 0) {
+        return '<p class="loading">No teams recorded for this session yet.</p>';
+    }
+
+    if (!revealed) {
+        // Suspense mode — show who's competing and their progress, but no scores.
+        const byName = [...dataList].sort((a, b) => a.name.localeCompare(b.name));
+        let html = '<table class="leaderboard-table">';
+        html += '<tr><th>Team Name</th><th>Status</th><th>Stalls</th></tr>';
+        byName.forEach(item => {
+            const status = item.complete
+                ? '<span class="pending ready">🔒 Ready</span>'
+                : `<span class="pending">${item.codes.length} / 4 stalls</span>`;
+            html += `<tr>
+                        <td>${item.name}</td>
+                        <td>${status}</td>
+                        <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+                     </tr>`;
+        });
+        html += '</table>';
+        return html;
+    }
+
+    // Revealed — ranked scoreboard, optionally animated in.
+    const ranked = [...dataList].sort((a, b) => b.score - a.score);
+    let html = `<table class="leaderboard-table${animate ? ' revealing' : ''}">`;
+    html += '<tr><th>Rank</th><th>Team Name</th><th>Score</th><th>Stalls</th></tr>';
+    ranked.forEach((item, index) => {
+        const delay = animate ? ` style="animation-delay:${index * 0.45}s"` : '';
+        const scoreCell = animate
+            ? `<strong class="countup" data-target="${item.score}">0</strong> / 40`
+            : `<strong>${item.score}</strong> / 40`;
+        html += `<tr${delay}>
+                    <td>#${index + 1}</td>
+                    <td>${item.name}</td>
+                    <td>${scoreCell}</td>
+                    <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+                 </tr>`;
+    });
+    html += '</table>';
+    return html;
+}
+
+// Count each revealed score up from zero for a bit of drama.
+function runCountUps(container) {
+    container.querySelectorAll('.countup').forEach(el => {
+        const target = parseInt(el.dataset.target, 10) || 0;
+        const start = performance.now();
+        const duration = 1400;
+        function frame(now) {
+            const t = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - t, 3);
+            el.textContent = Math.round(eased * target);
+            if (t < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    });
 }
 
 function processLeaderboards() {
@@ -74,7 +145,8 @@ function processLeaderboards() {
                 const stalls = columns[4] ? cleanField(columns[4]) : '-';
 
                 if(name) {
-                    allTeams.push({ session, name, score, stalls });
+                    const codes = parseVisited(stalls);
+                    allTeams.push({ session, name, score, stalls, codes, complete: hasAllStalls(codes) });
                 }
             });
 
@@ -83,15 +155,41 @@ function processLeaderboards() {
                 ? allTeams.filter(team => !isTestEntry(team.name))
                 : allTeams;
 
-            // 1. Process Global Standings (All-Time)
-            const allTimeSorted = [...visibleTeams].sort((a, b) => b.score - a.score);
+            // A session flows to All-Time only once it is revealed AND all four of its
+            // rostered teams have visited all four stalls.
+            const sessionQualifies = {};
+            function qualifies(session) {
+                if (session in sessionQualifies) return sessionQualifies[session];
+                let ok = false;
+                const roster = rosterForSessionString(session);
+                if (roster && isRevealed(session)) {
+                    const rows = visibleTeams.filter(t => t.session === session);
+                    ok = roster.every(rn => {
+                        const row = rows.find(r => r.name.trim().toLowerCase() === rn.trim().toLowerCase());
+                        return row && row.complete;
+                    });
+                }
+                return (sessionQualifies[session] = ok);
+            }
+
+            // 1. Process Global Standings (All-Time) — gated per session.
+            const allTimeSorted = visibleTeams
+                .filter(t => qualifies(t.session))
+                .sort((a, b) => b.score - a.score);
             document.getElementById('all-time-container').innerHTML = generateTableHTML(allTimeSorted);
 
-            // 2. Process Session Specific View
+            // 2. Process Session Specific View — hidden until revealed.
             const targetSession = sessionSelect.value;
             const sessionFiltered = visibleTeams.filter(team => team.session === targetSession);
-            const sessionSorted = sessionFiltered.sort((a, b) => b.score - a.score);
-            document.getElementById('session-container').innerHTML = generateTableHTML(sessionSorted);
+            const revealed = isRevealed(targetSession);
+            const animate = justRevealed === targetSession;
+            const sessionContainer = document.getElementById('session-container');
+            sessionContainer.innerHTML = generateSessionHTML(sessionFiltered, revealed, animate);
+            if (animate) {
+                runCountUps(sessionContainer);
+                justRevealed = null;
+            }
+            syncRevealBtn();
 
             lastSuccessTime = new Date();
             lastUpdatedEl.textContent = `Last updated: ${formatTime(lastSuccessTime)}`;
@@ -126,8 +224,21 @@ testToggleBtn.addEventListener('click', () => {
     processLeaderboards();
 });
 
-sessionSelect.addEventListener('change', processLeaderboards);
+revealBtn.addEventListener('click', () => {
+    const session = sessionSelect.value;
+    const next = !isRevealed(session);
+    setRevealed(session, next);
+    justRevealed = next ? session : null;   // animate only when revealing
+    syncRevealBtn();
+    processLeaderboards();
+});
+
+sessionSelect.addEventListener('change', () => {
+    syncRevealBtn();
+    processLeaderboards();
+});
 
 syncTestToggle();
+syncRevealBtn();
 processLeaderboards();
 setInterval(processLeaderboards, 15000);
