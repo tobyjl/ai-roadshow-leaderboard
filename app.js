@@ -65,17 +65,19 @@ function generateSessionHTML(dataList, revealed, animate) {
     }
 
     if (!revealed) {
-        // Suspense mode — show who's competing and their progress, but no scores.
-        const byName = [...dataList].sort((a, b) => a.name.localeCompare(b.name));
+        // Live scores while teams are still on the circuit; a team's score only
+        // hides once their final (4th) stall is in, holding it for the reveal.
+        const active = dataList.filter(t => !t.complete).sort((a, b) => b.score - a.score);
+        const locked = dataList.filter(t => t.complete).sort((a, b) => a.name.localeCompare(b.name));
         let html = '<table class="leaderboard-table">';
-        html += '<tr><th>Team Name</th><th>Status</th><th>Stalls</th></tr>';
-        byName.forEach(item => {
-            const status = item.complete
-                ? '<span class="pending ready">🔒 Ready</span>'
-                : `<span class="pending">${item.codes.length} / 4 stalls</span>`;
+        html += '<tr><th>Team Name</th><th>Score</th><th>Stalls</th></tr>';
+        [...active, ...locked].forEach(item => {
+            const scoreCell = item.complete
+                ? '<span class="pending ready">🔒 Locked in</span>'
+                : `<strong>${item.score}</strong> / 40`;
             html += `<tr>
                         <td>${item.name}</td>
-                        <td>${status}</td>
+                        <td>${scoreCell}</td>
                         <td><span class="stall-badge">${item.stalls || '-'}</span></td>
                      </tr>`;
         });

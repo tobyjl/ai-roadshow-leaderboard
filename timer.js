@@ -347,16 +347,18 @@ function renderBoard(rows, revealed) {
     }
 
     if (!revealed) {
-        // Suspense: show progress, not scores, until the operator reveals.
-        const byName = [...rows].sort((a, b) => a.name.localeCompare(b.name));
-        let html = '<table class="leaderboard-table"><tr><th>Team</th><th>Status</th><th>Stalls</th></tr>';
-        byName.forEach(item => {
-            const status = item.complete
-                ? '<span class="pending ready">🔒 Ready</span>'
-                : `<span class="pending">${item.codes.length} / 4</span>`;
+        // Live scores while teams are still playing; hide only once a team has
+        // completed all four stalls (final score held for the reveal).
+        const active = [...rows].filter(t => !t.complete).sort((a, b) => b.score - a.score);
+        const locked = [...rows].filter(t => t.complete).sort((a, b) => a.name.localeCompare(b.name));
+        let html = '<table class="leaderboard-table"><tr><th>Team</th><th>Score</th><th>Stalls</th></tr>';
+        [...active, ...locked].forEach(item => {
+            const scoreCell = item.complete
+                ? '<span class="pending ready">🔒 Locked in</span>'
+                : `<strong>${item.score}</strong> / 40`;
             html += `<tr>
                 <td>${item.name}</td>
-                <td>${status}</td>
+                <td>${scoreCell}</td>
                 <td><span class="stall-badge">${item.stalls || '-'}</span></td>
             </tr>`;
         });
