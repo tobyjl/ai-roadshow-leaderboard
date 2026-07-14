@@ -1,21 +1,23 @@
 /* ============================================================
    E.ON Next Roadshow — Live Timer logic
-   Sequence: Stall1 → transit → Stall2 → transit → Stall3 → transit → Stall4
-   4 stalls @ 10:00, 3 transits @ 1:30. Total run 44:30.
+   Sequence: Setup → Round1 → rotate → Round2 → rotate → Round3 → rotate → Round4
+   7:30 setup, 4 rounds @ 10:00, 3 rotations @ 1:30. Total run 52:00.
    ============================================================ */
 
 // ---- Phase definition ----
-const STALL_SECONDS = 10 * 60; // 600
-const TRANSIT_SECONDS = 90;    // 1:30
+const SETUP_SECONDS = 7 * 60 + 30; // 450 — form teams & reach starting stalls
+const STALL_SECONDS = 10 * 60;     // 600
+const TRANSIT_SECONDS = 90;        // 1:30
 
 const PHASES = [
-    { type: 'stall',   stall: 1,        duration: STALL_SECONDS },
-    { type: 'transit', from: 1, to: 2,  duration: TRANSIT_SECONDS },
-    { type: 'stall',   stall: 2,        duration: STALL_SECONDS },
-    { type: 'transit', from: 2, to: 3,  duration: TRANSIT_SECONDS },
-    { type: 'stall',   stall: 3,        duration: STALL_SECONDS },
-    { type: 'transit', from: 3, to: 4,  duration: TRANSIT_SECONDS },
-    { type: 'stall',   stall: 4,        duration: STALL_SECONDS },
+    { type: 'setup',                  duration: SETUP_SECONDS },
+    { type: 'stall',   round: 1,      duration: STALL_SECONDS },
+    { type: 'transit', afterRound: 1, duration: TRANSIT_SECONDS },
+    { type: 'stall',   round: 2,      duration: STALL_SECONDS },
+    { type: 'transit', afterRound: 2, duration: TRANSIT_SECONDS },
+    { type: 'stall',   round: 3,      duration: STALL_SECONDS },
+    { type: 'transit', afterRound: 3, duration: TRANSIT_SECONDS },
+    { type: 'stall',   round: 4,      duration: STALL_SECONDS },
 ];
 const TOTAL_SECONDS = PHASES.reduce((s, p) => s + p.duration, 0);
 
@@ -117,15 +119,26 @@ function alertPhaseChange(kind) {
 function phaseThemeClass() {
     if (finished) return 'phase-finished';
     if (!isRunning && phaseEndTime === null) return 'phase-idle';
-    return PHASES[phaseIndex].type === 'transit' ? 'phase-transit' : 'phase-stall';
+    const t = PHASES[phaseIndex].type;
+    if (t === 'transit') return 'phase-transit';
+    if (t === 'setup') return 'phase-setup';
+    return 'phase-stall';
 }
 
 function updateJourney() {
-    journeyEl.querySelectorAll('.stop, .leg').forEach(el => {
-        const idx = parseInt(el.dataset.phase, 10);
+    const done = completedRounds();
+    const p = finished ? null : PHASES[phaseIndex];
+    journeyEl.querySelectorAll('.stop').forEach(el => {
+        const R = parseInt(el.dataset.round, 10);
         el.classList.remove('active', 'done');
-        if (finished || idx < phaseIndex) el.classList.add('done');
-        else if (idx === phaseIndex && !finished) el.classList.add('active');
+        if (finished || R <= done) el.classList.add('done');
+        else if (p && p.type === 'stall' && p.round === R) el.classList.add('active');
+    });
+    journeyEl.querySelectorAll('.leg').forEach(el => {
+        const A = parseInt(el.dataset.after, 10);
+        el.classList.remove('active', 'done');
+        if (!finished && p && p.type === 'transit' && p.afterRound === A) el.classList.add('active');
+        else if (finished || done >= A) el.classList.add('done');
     });
 }
 
@@ -137,9 +150,9 @@ function isIdle() {
 // How many stall-rounds are fully finished at the current phase (0–4).
 function completedRounds() {
     if (finished) return 4;
-    if (isIdle()) return 0;
-    const p = PHASES[phaseIndex];
-    return p.type === 'stall' ? p.stall - 1 : (phaseIndex + 1) / 2;
+    let n = 0;
+    for (let i = 0; i < phaseIndex; i++) if (PHASES[i].type === 'stall') n++;
+    return n;
 }
 
 function updateDisplay() {
@@ -163,9 +176,12 @@ function updateDisplay() {
 
     if (isIdle()) {
         phaseLabel.textContent = 'Ready to start';
-        phaseSub.textContent = '4 rounds · 10:00 at each stall · 1:30 to rotate';
+        phaseSub.textContent = '7:30 to get ready, then 4 rounds of 10:00';
+    } else if (p.type === 'setup') {
+        phaseLabel.textContent = 'Get to your stalls';
+        phaseSub.textContent = isRunning ? 'Form your teams and head to your starting stall' : 'Paused';
     } else if (p.type === 'stall') {
-        phaseLabel.textContent = `Round ${p.stall} of 4`;
+        phaseLabel.textContent = `Round ${p.round} of 4`;
         phaseSub.textContent = isRunning ? '10 minutes — teams at their stalls' : 'Paused';
     } else {
         phaseLabel.textContent = 'Rotate →';
@@ -222,24 +238,24 @@ function renderAssignments() {
     const teams = getRosterForActive();
     const p = PHASES[phaseIndex];
 
-    if (p.type === 'stall') {
-        // Round r (0-indexed) = p.stall - 1. Show which team is at each stall.
-        const r = p.stall - 1;
-        const occ = occupancyForRound(r);
-        assignEl.innerHTML = occ.map((teamIdx, s) => `
-            <div class="assign-chip stall">
-                <span class="chip-stall">Stall ${s + 1}</span>
-                <span class="chip-team">${teams[teamIdx]}</span>
-            </div>`).join('');
-    } else {
-        // Transit after round r. Show each team's next stall.
-        const r = (phaseIndex - 1) / 2;
-        const moves = movementsAfterRound(r);
+    if (p.type === 'transit') {
+        // Show each team's next stall for the rotation just starting.
+        const moves = movementsAfterRound(p.afterRound - 1);
         assignEl.innerHTML = moves.map(m => `
             <div class="assign-chip move">
                 <span class="chip-team">${teams[m.teamIndex]}</span>
                 <span class="chip-arrow">→</span>
                 <span class="chip-stall">Stall ${m.to}</span>
+            </div>`).join('');
+    } else {
+        // Setup shows starting positions (round 0); a round shows current occupancy.
+        const r = p.type === 'setup' ? 0 : p.round - 1;
+        const occ = occupancyForRound(r);
+        const verb = p.type === 'setup' ? 'Start at' : '';
+        assignEl.innerHTML = occ.map((teamIdx, s) => `
+            <div class="assign-chip stall">
+                <span class="chip-stall">${verb} Stall ${s + 1}</span>
+                <span class="chip-team">${teams[teamIdx]}</span>
             </div>`).join('');
     }
 }

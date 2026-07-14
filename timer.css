@@ -19,6 +19,7 @@ body {
     transition: background 600ms ease;
 }
 body.phase-idle     { background: #faf6f4; }
+body.phase-setup    { background: radial-gradient(circle at 30% 20%, #3557a8 0%, #23386e 70%); color: #ffffff; }
 body.phase-stall    { background: radial-gradient(circle at 30% 20%, #4a2263 0%, #36164a 70%); color: #ffffff; }
 body.phase-transit  { background: radial-gradient(circle at 30% 20%, #ff6a47 0%, #ff4822 70%); color: #ffffff; }
 body.phase-finished { background: radial-gradient(circle at 30% 20%, #2f9e6f 0%, #1f7d57 70%); color: #ffffff; }

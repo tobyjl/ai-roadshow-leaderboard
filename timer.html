@@ -21,25 +21,25 @@
             <!-- LEFT: The big timer -->
             <section class="timer-stage">
                 <div id="phase-label" class="phase-label">Ready to start</div>
-                <div id="phase-sub" class="phase-sub">4 rounds · 10:00 at each stall · 1:30 to rotate</div>
+                <div id="phase-sub" class="phase-sub">7:30 to get ready, then 4 rounds of 10:00</div>
 
-                <div id="clock" class="clock">44:30</div>
+                <div id="clock" class="clock">7:30</div>
 
                 <!-- Per-team assignments: stall occupancy during a round, or moves during transit -->
                 <div id="assignments" class="assignments"></div>
 
                 <!-- Journey progress: 4 rounds linked by 3 rotations -->
                 <div class="journey" id="journey">
-                    <div class="stop" data-phase="0"><span class="stop-dot">1</span><span class="stop-name">Round 1</span></div>
-                    <div class="leg" data-phase="1"></div>
-                    <div class="stop" data-phase="2"><span class="stop-dot">2</span><span class="stop-name">Round 2</span></div>
-                    <div class="leg" data-phase="3"></div>
-                    <div class="stop" data-phase="4"><span class="stop-dot">3</span><span class="stop-name">Round 3</span></div>
-                    <div class="leg" data-phase="5"></div>
-                    <div class="stop" data-phase="6"><span class="stop-dot">4</span><span class="stop-name">Round 4</span></div>
+                    <div class="stop" data-round="1"><span class="stop-dot">1</span><span class="stop-name">Round 1</span></div>
+                    <div class="leg" data-after="1"></div>
+                    <div class="stop" data-round="2"><span class="stop-dot">2</span><span class="stop-name">Round 2</span></div>
+                    <div class="leg" data-after="2"></div>
+                    <div class="stop" data-round="3"><span class="stop-dot">3</span><span class="stop-name">Round 3</span></div>
+                    <div class="leg" data-after="3"></div>
+                    <div class="stop" data-round="4"><span class="stop-dot">4</span><span class="stop-name">Round 4</span></div>
                 </div>
 
-                <div id="overall" class="overall">Total run 44:30</div>
+                <div id="overall" class="overall">Total run 52:00</div>
 
                 <!-- Operator controls -->
                 <div class="controls">
