@@ -50,7 +50,7 @@ function generateTableHTML(dataList) {
                     <td>#${index + 1}</td>
                     <td>${item.name}</td>
                     <td><strong>${item.score}</strong> / 40</td>
-                    <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+                    <td>${stallPillsHTML(item.codes)}</td>
                  </tr>`;
     });
 
@@ -78,7 +78,7 @@ function generateSessionHTML(dataList, revealed, animate) {
             html += `<tr>
                         <td>${item.name}</td>
                         <td>${scoreCell}</td>
-                        <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+                        <td>${stallPillsHTML(item.codes)}</td>
                      </tr>`;
         });
         html += '</table>';
@@ -98,7 +98,7 @@ function generateSessionHTML(dataList, revealed, animate) {
                     <td>#${index + 1}</td>
                     <td>${item.name}</td>
                     <td>${scoreCell}</td>
-                    <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+                    <td>${stallPillsHTML(item.codes)}</td>
                  </tr>`;
     });
     html += '</table>';

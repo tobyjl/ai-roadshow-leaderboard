@@ -45,6 +45,29 @@ body.phase-finished { background: radial-gradient(circle at 30% 20%, #2f9e6f 0%,
     letter-spacing: -0.5px;
     opacity: 0.9;
 }
+.timer-header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.header-btn {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: clamp(11px, 1.5vh, 14px);
+    color: currentColor;
+    text-decoration: none;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 100px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: 150ms;
+}
+.header-btn:hover { background: rgba(255,255,255,0.24); }
+.header-btn.off { opacity: 0.6; }
+/* On the light idle background the header text is dark */
+body.phase-idle .header-btn { border-color: rgba(54,22,74,0.25); background: rgba(54,22,74,0.05); }
 
 .timer-main {
     flex: 1 1 auto;
@@ -310,6 +333,19 @@ body.phase-idle .ctrl-primary { background: #36164a; color: #fff; border-color: 
     font-size: 0.8em;
     border: 1px solid #dfd3d9;
 }
+.stall-pill {
+    display: inline-block;
+    margin: 2px 3px 2px 0;
+    padding: 2px 9px;
+    border-radius: 100px;
+    font-size: clamp(10px, 1.3vh, 13px);
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+}
+.stall-pill.orange { background: #ff4822; }
+.stall-pill.purple { background: #36164a; }
+.stall-none { color: #b3a6bb; font-weight: 700; }
 .loading { text-align: center; color: #7e6787; font-style: italic; padding: 20px 0; }
 .side-updated {
     margin-top: 12px;

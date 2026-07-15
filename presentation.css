@@ -1,0 +1,294 @@
+/* ============================================================
+   E.ON Next AI Roadshow — Presentation / between-sessions loop
+   Palette: Purple #36164a · Vivid #5e17a0 · Orange #ff4822 · Cream #faf6f4
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --purple: #36164a;
+    --vivid: #5e17a0;
+    --orange: #ff4822;
+    --cream: #faf6f4;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--cream);
+    color: var(--purple);
+    font-family: "Fredoka", "Baloo 2", system-ui, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- Ambient background ---------- */
+.bg { position: fixed; inset: 0; overflow: hidden; z-index: 0; }
+
+.band {
+    position: absolute;
+    width: 160%;
+    height: 60%;
+    left: -30%;
+    transform: rotate(-8deg);
+    opacity: 0.10;
+    filter: blur(2px);
+}
+.band-purple { top: -34%; background: var(--purple); }
+.band-orange { bottom: -34%; background: var(--orange); }
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.16;
+    animation: drift 22s ease-in-out infinite;
+}
+.orb1 { width: 220px; height: 220px; background: var(--vivid); top: 12%; left: 8%; animation-delay: -2s; }
+.orb2 { width: 120px; height: 120px; background: var(--orange); top: 62%; left: 18%; animation-delay: -8s; }
+.orb3 { width: 300px; height: 300px; background: var(--purple); top: 20%; right: 6%; animation-delay: -5s; }
+.orb4 { width: 90px;  height: 90px;  background: var(--orange); bottom: 12%; right: 22%; animation-delay: -12s; }
+@keyframes drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(30px, -24px) scale(1.08); }
+    66%      { transform: translate(-20px, 18px) scale(0.96); }
+}
+
+.circuit { position: absolute; inset: 0; width: 100%; height: 100%; }
+.circuit .trace {
+    fill: none;
+    stroke: var(--vivid);
+    stroke-width: 3;
+    stroke-linecap: round;
+    opacity: 0.22;
+    stroke-dasharray: 14 220;
+    animation: flow 6s linear infinite;
+}
+.circuit .trace:nth-child(2) { stroke: var(--orange); animation-duration: 7.5s; }
+.circuit .trace:nth-child(4) { stroke: var(--orange); animation-duration: 8.5s; }
+@keyframes flow { to { stroke-dashoffset: -234; } }
+.circuit .node { fill: var(--orange); opacity: 0.5; animation: pulse 3s ease-in-out infinite; }
+.circuit .node:nth-child(even) { fill: var(--vivid); }
+@keyframes pulse { 0%,100% { r: 7; opacity: 0.35; } 50% { r: 12; opacity: 0.7; } }
+
+/* ---------- Slide deck ---------- */
+#deck { position: fixed; inset: 0; z-index: 1; }
+.slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(40px, 6vw, 110px);
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+}
+.slide.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+
+/* Shared bits */
+.kicker {
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--orange);
+    font-size: clamp(14px, 1.8vw, 22px);
+    margin-bottom: 10px;
+}
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 3px solid var(--vivid);
+    border-radius: 100px;
+    padding: 10px 22px;
+    font-weight: 600;
+    font-size: clamp(16px, 1.9vw, 26px);
+    background: rgba(255,255,255,0.6);
+}
+.pill .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--orange); }
+/* Entrance flourish — content defaults visible; the hidden state lives in the
+   keyframe so a mis-fired animation can never leave a slide blank. */
+.slide.active .reveal-up { animation: up 0.7s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes up { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Hero ---------- */
+.hero .summer {
+    align-self: flex-start;
+    border: 3px solid var(--purple);
+    color: var(--purple);
+    border-radius: 100px;
+    padding: 8px 26px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    font-size: clamp(14px, 1.6vw, 22px);
+    margin-bottom: clamp(20px, 3vw, 40px);
+}
+.hero h1 {
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -2px;
+    font-size: clamp(72px, 15vw, 260px);
+    color: var(--purple);
+}
+.hero h1 .orange { color: var(--orange); }
+.hero .lead {
+    margin-top: clamp(20px, 3vw, 44px);
+    font-weight: 600;
+    font-size: clamp(24px, 3.4vw, 54px);
+    color: var(--vivid);
+}
+.hero .sub {
+    margin-top: 12px;
+    font-weight: 400;
+    font-size: clamp(16px, 2vw, 30px);
+    color: var(--purple);
+    opacity: 0.8;
+    max-width: 22ch;
+}
+
+/* ---------- Circuit overview ---------- */
+.overview h2, .champion h2, .stall .stall-body-title {
+    font-weight: 700;
+    letter-spacing: -1px;
+    font-size: clamp(40px, 6vw, 96px);
+    color: var(--purple);
+    margin-bottom: clamp(24px, 3vw, 48px);
+}
+.stall-list { display: flex; flex-direction: column; gap: clamp(12px, 1.6vw, 22px); }
+.stall-row {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    background: #fff;
+    border: 3px solid var(--vivid);
+    border-radius: 100px;
+    padding: clamp(10px, 1.4vw, 18px) clamp(20px, 2.4vw, 34px);
+    font-weight: 600;
+    font-size: clamp(22px, 3vw, 44px);
+    max-width: 900px;
+}
+.stall-row .num {
+    flex: 0 0 auto;
+    width: clamp(40px, 3.4vw, 64px);
+    height: clamp(40px, 3.4vw, 64px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700;
+    font-size: clamp(20px, 2.4vw, 34px);
+}
+.stall-row.orange .num { background: var(--orange); }
+.stall-row.purple .num { background: var(--vivid); }
+
+/* ---------- Stall slide ---------- */
+.stall { padding: 0; justify-content: flex-start; }
+.stall .band-head {
+    position: relative;
+    padding: clamp(30px, 4vw, 60px) clamp(40px, 6vw, 110px) clamp(46px, 5vw, 80px);
+    color: #fff;
+    clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+}
+.stall.orange .band-head { background: var(--orange); }
+.stall.purple .band-head { background: var(--vivid); }
+.stall .band-head .kicker { color: rgba(255,255,255,0.85); }
+.stall .head-row { display: flex; align-items: center; gap: clamp(16px, 2vw, 30px); }
+.stall .head-num {
+    width: clamp(56px, 5vw, 96px); height: clamp(56px, 5vw, 96px);
+    background: #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: clamp(28px, 3vw, 52px);
+}
+.stall.orange .head-num { color: var(--orange); }
+.stall.purple .head-num { color: var(--vivid); }
+.stall .head-name {
+    font-weight: 700; letter-spacing: -1px;
+    font-size: clamp(40px, 6.4vw, 104px);
+    line-height: 1;
+}
+.stall .watermark {
+    position: absolute; right: clamp(20px, 3vw, 60px); top: 50%;
+    transform: translateY(-58%);
+    font-weight: 700; font-size: clamp(120px, 20vw, 340px);
+    color: rgba(255,255,255,0.12); line-height: 1; pointer-events: none;
+}
+.stall .stall-body {
+    padding: clamp(20px, 2.6vw, 44px) clamp(40px, 6vw, 110px);
+    flex: 1; display: flex; flex-direction: column; gap: clamp(14px, 1.8vw, 26px);
+}
+.section-label {
+    font-weight: 600; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--purple); font-size: clamp(14px, 1.6vw, 22px);
+    border-bottom: 4px solid var(--orange); padding-bottom: 6px;
+    width: fit-content;
+}
+.topics { display: flex; flex-wrap: wrap; gap: clamp(10px, 1.4vw, 20px); }
+.topics .pill { border-color: var(--orange); }
+.topics .pill .dot { background: var(--vivid); }
+.activities { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2vw, 30px); }
+.activity {
+    background: #fff; border: 3px solid;
+    border-radius: 22px; padding: clamp(18px, 2vw, 32px);
+    display: flex; align-items: center; gap: clamp(14px, 1.6vw, 26px);
+}
+.stall.orange .activity { border-color: var(--orange); }
+.stall.purple .activity { border-color: var(--vivid); }
+.activity .icon {
+    flex: 0 0 auto;
+    width: clamp(48px, 4vw, 76px); height: clamp(48px, 4vw, 76px);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: clamp(22px, 2.4vw, 38px);
+}
+.stall.orange .activity:nth-child(1) .icon { background: var(--vivid); }
+.stall.orange .activity:nth-child(2) .icon { background: var(--vivid); }
+.stall.purple .activity .icon { background: var(--orange); }
+.activity .a-title {
+    font-weight: 700; font-size: clamp(20px, 2.4vw, 40px);
+    line-height: 1.05; margin-bottom: 4px;
+}
+.stall.orange .activity .a-title { color: var(--orange); }
+.stall.purple .activity .a-title { color: var(--vivid); }
+.activity .a-desc { font-weight: 400; font-size: clamp(14px, 1.6vw, 24px); color: var(--purple); }
+
+/* ---------- Champion ---------- */
+.champion { align-items: flex-start; }
+.champion .kicker { color: var(--vivid); }
+.champion h2 { max-width: 16ch; }
+.champion h2 .orange { color: var(--orange); }
+.champion .sub { font-weight: 500; font-size: clamp(20px, 2.6vw, 40px); color: var(--purple); opacity: 0.8; }
+.champion .logo { height: clamp(40px, 5vw, 80px); margin-top: clamp(30px, 4vw, 60px); }
+
+/* ---------- Chrome ---------- */
+.progress {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 12px; z-index: 2;
+}
+.progress .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: rgba(54,22,74,0.22); transition: 300ms; cursor: pointer;
+}
+.progress .dot.on { background: var(--orange); width: 34px; border-radius: 100px; }
+
+.pres-hint {
+    position: fixed; bottom: 26px; right: 28px; z-index: 2;
+    font-size: 14px; font-weight: 500; color: var(--purple); opacity: 0.4;
+}
+.pres-exit {
+    position: fixed; top: 22px; right: 26px; z-index: 3;
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; color: var(--purple);
+    background: rgba(54,22,74,0.08); font-size: 18px; font-weight: 700;
+    opacity: 0.35; transition: 150ms;
+}
+.pres-exit:hover { opacity: 1; background: rgba(54,22,74,0.16); }
+
+.paused-badge {
+    position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+    z-index: 3; background: var(--purple); color: #fff;
+    padding: 8px 20px; border-radius: 100px; font-weight: 600; font-size: 15px;
+    opacity: 0; transition: 200ms; pointer-events: none;
+}
+.paused-badge.show { opacity: 1; }
+
+@media (max-aspect-ratio: 1/1) {
+    .activities { grid-template-columns: 1fr; }
+    .hero .sub { max-width: none; }
+}

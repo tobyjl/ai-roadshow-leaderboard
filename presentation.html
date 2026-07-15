@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E.ON Next AI Roadshow — Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="presentation.css">
+</head>
+<body>
+    <!-- Ambient animated background: colour bands, circuit traces, floating shapes -->
+    <div class="bg">
+        <div class="band band-purple"></div>
+        <div class="band band-orange"></div>
+        <span class="orb orb1"></span>
+        <span class="orb orb2"></span>
+        <span class="orb orb3"></span>
+        <span class="orb orb4"></span>
+        <svg class="circuit" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <path class="trace" d="M-20,120 H240 a24,24 0 0 1 24,24 V320 a24,24 0 0 0 24,24 H520" />
+            <path class="trace" d="M1620,760 H1360 a24,24 0 0 1 -24,-24 V560 a24,24 0 0 0 -24,-24 H1040" />
+            <path class="trace" d="M1620,180 H1460 a24,24 0 0 0 -24,24 V300" />
+            <path class="trace" d="M-20,720 H180 a24,24 0 0 0 24,-24 V520" />
+            <circle class="node" cx="520" cy="344" r="9" />
+            <circle class="node" cx="1040" cy="536" r="9" />
+            <circle class="node" cx="1436" cy="300" r="9" />
+            <circle class="node" cx="204" cy="520" r="9" />
+        </svg>
+    </div>
+
+    <main id="deck"></main>
+
+    <div class="progress" id="progress"></div>
+    <div class="pres-hint">Space&nbsp;pause · ← →&nbsp;slides · F&nbsp;full screen</div>
+    <a href="index.html" class="pres-exit" title="Exit presentation">✕</a>
+
+    <script src="schedule.js"></script>
+    <script src="presentation.js"></script>
+</body>
+</html>

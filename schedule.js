@@ -111,6 +111,24 @@ function isTestEntry(name) {
    Stall 1 = C, Stall 2 = G, Stall 3 = N, Stall 4 = H. */
 const STALL_CODES = ['C', 'G', 'N', 'H'];
 
+// Friendly stall names (shown instead of the bare letter codes).
+const STALL_MEANINGS = { C: 'Cyber AI', G: 'Google GenAI', N: 'AI at Next', H: 'Horizon AI' };
+// Brand colour per stall (mirrors the poster's orange/purple alternation).
+const STALL_COLORS = { C: 'orange', G: 'purple', N: 'orange', H: 'purple' };
+
+function stallName(code) {
+    return STALL_MEANINGS[code] || code;
+}
+
+// Render a team's visited codes as small colour-coded name pills (stall order).
+function stallPillsHTML(codes) {
+    if (!codes || codes.length === 0) return '<span class="stall-none">—</span>';
+    return STALL_CODES
+        .filter(c => codes.includes(c))
+        .map(c => `<span class="stall-pill ${STALL_COLORS[c]}">${stallName(c)}</span>`)
+        .join('');
+}
+
 // Parse "C, H, N" → ['C','H','N'] (upper-cased, de-duped).
 function parseVisited(str) {
     const seen = cleanField(str).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);

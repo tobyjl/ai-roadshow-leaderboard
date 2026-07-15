@@ -81,6 +81,8 @@ body {
     transition: 150ms;
 }
 .timer-link:hover { background: #e13d1c; }
+.presentation-link { background: #36164a; }
+.presentation-link:hover { background: #2a1139; }
 
 /* Reveal button — stands out as the "showtime" control */
 .reveal-btn { border-color: #ff4822; color: #ff4822; }
@@ -138,6 +140,21 @@ select:disabled { background: #f6f0ed !important; color: #7e6787 !important; cur
 .leaderboard-table tr:nth-child(2) td:first-child { color: #ff4822; }
 
 .loading { text-align: center; color: #7e6787; font-style: italic; padding: 20px 0; }
+
+/* Visited-stall name pills (replace the bare letter codes) */
+.stall-pill {
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+}
+.stall-pill.orange { background: #ff4822; }
+.stall-pill.purple { background: #36164a; }
+.stall-none { color: #b3a6bb; font-weight: 700; }
 
 /* Stalls Badge */
 .stall-badge {

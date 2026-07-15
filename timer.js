@@ -92,7 +92,34 @@ function playChime(kind) {
         beep(587, 0, 0.22); beep(880, 0.24, 0.4);
     } else if (kind === 'finish') {    // celebratory rising run
         beep(587, 0, 0.2); beep(740, 0.22, 0.2); beep(880, 0.44, 0.2); beep(1174, 0.66, 0.6);
+    } else if (kind === 'warning') {   // heads-up: time almost up
+        beep(660, 0, 0.18, 0.28); beep(660, 0.26, 0.28, 0.28);
     }
+}
+
+// ============================================================
+//  Voice announcements (Web Speech API)
+// ============================================================
+let announceOn = localStorage.getItem('announceOn') !== 'false';
+
+function speak(text) {
+    if (!announceOn || !('speechSynthesis' in window)) return;
+    try {
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.98; u.pitch = 1.0; u.volume = 1.0;
+        const voices = speechSynthesis.getVoices();
+        const pref = voices.find(v => /en-GB/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang));
+        if (pref) u.voice = pref;
+        speechSynthesis.cancel();   // drop any backlog so cues stay timely
+        speechSynthesis.speak(u);
+    } catch (e) { /* ignore */ }
+}
+
+function announcePhase(p) {
+    if (!p) return;
+    if (p.type === 'setup')        speak('Get into your teams and head to your starting stalls.');
+    else if (p.type === 'stall')   speak(`Round ${p.round}. Go!`);
+    else if (p.type === 'transit') speak(`Round ${p.afterRound} complete. Rotate to your next stall.`);
 }
 
 // ============================================================
@@ -222,7 +249,7 @@ function renderMissingFlag() {
     const html = missing.length === 0
         ? ''
         : `<div class="missing-title">⚠ Missing scores</div>` +
-          missing.map(m => `<div class="missing-item">${m.team} · <strong>Stall ${m.stall}</strong> (${m.code})</div>`).join('');
+          missing.map(m => `<div class="missing-item">${m.team} · <strong>${stallName(m.code)}</strong> (Stall ${m.stall})</div>`).join('');
 
     if (html !== lastMissingHtml) {
         missingEl.innerHTML = html;
@@ -263,11 +290,22 @@ function renderAssignments() {
 // ============================================================
 //  Timer engine
 // ============================================================
+const WARN_AT = 30;        // seconds-remaining warning cue
+let warnedPhase = -1;      // phase index we've already warned for
+
 function tick() {
     remainingMs = phaseEndTime - Date.now();
     if (remainingMs <= 0) {
         advancePhase();
         return;
+    }
+    // 30-second heads-up on the long phases (setup + rounds), fired once.
+    const p = PHASES[phaseIndex];
+    if (isRunning && p.duration >= 300 && remainingMs / 1000 <= WARN_AT && warnedPhase !== phaseIndex) {
+        warnedPhase = phaseIndex;
+        playChime('warning');
+        flash('#ffb300');
+        speak('Thirty seconds remaining.');
     }
     updateDisplay();
 }
@@ -279,6 +317,7 @@ function advancePhase() {
         clearInterval(tickInterval);
         remainingMs = 0;
         alertPhaseChange('finish');
+        setTimeout(() => speak('Time! That is a wrap — well done everyone.'), 500);
         updateDisplay();
         return;
     }
@@ -286,6 +325,7 @@ function advancePhase() {
     remainingMs = PHASES[phaseIndex].duration * 1000;
     phaseEndTime = Date.now() + remainingMs;
     alertPhaseChange(PHASES[phaseIndex].type);
+    setTimeout(() => announcePhase(PHASES[phaseIndex]), 500);   // let the chime land first
     updateDisplay();
 }
 
@@ -293,10 +333,12 @@ function start() {
     if (finished) { reset(); }
     if (isRunning) return;
     ensureAudio();
+    const freshStart = isIdle();
     isRunning = true;
     phaseEndTime = Date.now() + remainingMs;
     clearInterval(tickInterval);
     tickInterval = setInterval(tick, 200);
+    if (freshStart) announcePhase(PHASES[phaseIndex]);   // announce the setup phase
     updateDisplay();
 }
 
@@ -312,9 +354,11 @@ function toggle() { isRunning ? pause() : start(); }
 
 function reset() {
     clearInterval(tickInterval);
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
     isRunning = false;
     finished = false;
     phaseIndex = 0;
+    warnedPhase = -1;
     remainingMs = PHASES[0].duration * 1000;
     phaseEndTime = null;
     updateDisplay();
@@ -340,6 +384,20 @@ skipBtn.addEventListener('click', skip);
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
 });
+
+// Voice announcements toggle
+const voiceBtn = document.getElementById('voice-btn');
+function syncVoiceBtn() {
+    voiceBtn.textContent = announceOn ? '🔊 Voice on' : '🔇 Voice off';
+    voiceBtn.classList.toggle('off', !announceOn);
+}
+voiceBtn.addEventListener('click', () => {
+    announceOn = !announceOn;
+    localStorage.setItem('announceOn', announceOn);
+    if (!announceOn && 'speechSynthesis' in window) speechSynthesis.cancel();
+    syncVoiceBtn();
+});
+syncVoiceBtn();
 
 // ============================================================
 //  Live "Current Session" leaderboard (mirrors the main board)
@@ -375,7 +433,7 @@ function renderBoard(rows, revealed) {
             html += `<tr>
                 <td>${item.name}</td>
                 <td>${scoreCell}</td>
-                <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+                <td>${stallPillsHTML(item.codes)}</td>
             </tr>`;
         });
         return html + '</table>';
@@ -388,7 +446,7 @@ function renderBoard(rows, revealed) {
             <td>#${i + 1}</td>
             <td>${item.name}</td>
             <td><strong>${item.score}</strong> / 40</td>
-            <td><span class="stall-badge">${item.stalls || '-'}</span></td>
+            <td>${stallPillsHTML(item.codes)}</td>
         </tr>`;
     });
     return html + '</table>';
