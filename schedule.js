@@ -37,9 +37,29 @@ const SESSION_SLOTS = [
     { sessionNum: 4, slot: '2:30pm',  fromMin: 870, label: '14:30' },
 ];
 
-// Map a calendar date to the event day number. 15th → 1, 16th → 2, else 1.
+// Ignore anything logged before the Nottingham leg (old test data etc.).
+const ENTRY_CUTOFF = new Date(2026, 7, 17); // 17 Aug 2026, local midnight
+
+// Parse the sheet's Timestamp cell — "DD/MM/YYYY HH:MM:SS" or gviz "Date(y,m,d,…)".
+function parseSheetTimestamp(str) {
+    if (!str) return null;
+    str = str.trim();
+    let m = /^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/.exec(str);
+    if (m) return new Date(+m[1], +m[2], +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+    m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(str);
+    if (m) return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+    return null;
+}
+
+// True only when we can parse the timestamp AND it predates the cutoff.
+function isBeforeCutoff(timestampStr) {
+    const t = parseSheetTimestamp(timestampStr);
+    return t !== null && t < ENTRY_CUTOFF;
+}
+
+// Nottingham leg calendar: 18 Aug → Day 1, 19 Aug → Day 2 (fallback Day 1).
 function dayNumForDate(date) {
-    return date.getDate() === 16 ? 2 : 1;
+    return date.getDate() === 19 ? 2 : 1;
 }
 
 // Work out the active day + session from the current time.

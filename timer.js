@@ -21,6 +21,8 @@ const PHASES = [
 ];
 const TOTAL_SECONDS = PHASES.reduce((s, p) => s + p.duration, 0);
 
+const WELCOME = 'Welcome to the AI Roadshow, Nottingham!';
+
 // ---- State ----
 let phaseIndex = 0;
 let remainingMs = PHASES[0].duration * 1000;
@@ -117,7 +119,7 @@ function speak(text) {
 
 function announcePhase(p) {
     if (!p) return;
-    if (p.type === 'setup')        speak('Get into your teams and head to your starting stalls.');
+    if (p.type === 'setup')        speak('Welcome to the A.I. Roadshow, Nottingham! Please gather at the front for the briefing.');
     else if (p.type === 'stall')   speak(`Round ${p.round}. Go!`);
     else if (p.type === 'transit') speak(`Round ${p.afterRound} complete. Rotate to your next stall.`);
 }
@@ -202,11 +204,11 @@ function updateDisplay() {
     clockEl.textContent = fmt(secs);
 
     if (isIdle()) {
-        phaseLabel.textContent = 'Ready to start';
-        phaseSub.textContent = '7:30 to get ready, then 4 rounds of 10:00';
+        phaseLabel.textContent = WELCOME;
+        phaseSub.textContent = 'Press start to open the 7:30 arrival window';
     } else if (p.type === 'setup') {
-        phaseLabel.textContent = 'Get to your stalls';
-        phaseSub.textContent = isRunning ? 'Form your teams and head to your starting stall' : 'Paused';
+        phaseLabel.textContent = WELCOME;
+        phaseSub.textContent = isRunning ? 'Please gather at the front for the briefing' : 'Paused';
     } else if (p.type === 'stall') {
         phaseLabel.textContent = `Round ${p.round} of 4`;
         phaseSub.textContent = isRunning ? '10 minutes — teams at their stalls' : 'Paused';
@@ -260,7 +262,8 @@ function renderMissingFlag() {
 
 // Per-team panel: stall occupancy during a round, per-team moves during a rotation.
 function renderAssignments() {
-    if (finished) { assignEl.innerHTML = ''; return; }
+    // Setup is a front-of-room briefing now — no stall chips until Round 1.
+    if (finished || PHASES[phaseIndex].type === 'setup') { assignEl.innerHTML = ''; return; }
 
     const teams = getRosterForActive();
     const p = PHASES[phaseIndex];
@@ -275,13 +278,11 @@ function renderAssignments() {
                 <span class="chip-stall">Stall ${m.to}</span>
             </div>`).join('');
     } else {
-        // Setup shows starting positions (round 0); a round shows current occupancy.
-        const r = p.type === 'setup' ? 0 : p.round - 1;
-        const occ = occupancyForRound(r);
-        const verb = p.type === 'setup' ? 'Start at' : '';
+        // A round shows which team is at each stall.
+        const occ = occupancyForRound(p.round - 1);
         assignEl.innerHTML = occ.map((teamIdx, s) => `
             <div class="assign-chip stall">
-                <span class="chip-stall">${verb} Stall ${s + 1}</span>
+                <span class="chip-stall">Stall ${s + 1}</span>
                 <span class="chip-team">${teams[teamIdx]}</span>
             </div>`).join('');
     }
@@ -468,6 +469,7 @@ function refreshBoard() {
                 if (!row.trim()) return;
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 if (cols.length < 4) return;
+                if (isBeforeCutoff(cleanField(cols[0]))) return;
                 const session = cleanField(cols[1]);
                 const name = cleanField(cols[2]);
                 const score = parseInt(cleanField(cols[3])) || 0;

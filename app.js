@@ -140,6 +140,9 @@ function processLeaderboards() {
                 const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 if (columns.length < 4) return;
 
+                // Skip anything logged before this leg (old test data, prior legs).
+                if (isBeforeCutoff(cleanField(columns[0]))) return;
+
                 const session = cleanField(columns[1]);
                 const name = cleanField(columns[2]);
                 const score = parseInt(cleanField(columns[3])) || 0;
