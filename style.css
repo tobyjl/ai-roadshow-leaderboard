@@ -1,8 +1,9 @@
 /* E.ON Next Design System Tokens */
 body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-    background-color: #faf6f4 !important; /* Birch */
-    color: #4a4a4a; /* Grey VDark */
+    font-family: var(--font-text) !important;
+    line-height: var(--line-height);
+    background-color: var(--birch) !important; /* Birch */
+    color: var(--grape); /* Grape */
     display: flex;
     justify-content: center;
     padding: 40px 24px;
@@ -18,10 +19,10 @@ body {
 .eon-header { text-align: center; padding-bottom: 10px; }
 .eon-logo { height: 54px; margin: 0 auto 10px; display: block; }
 .eon-wordmark { display: flex; flex-direction: column; align-items: center; line-height: 0.9; margin-bottom: 10px; }
-.eon-word-eon { color: #ff4822 !important; font-weight: 700; font-size: 20px; }
-.eon-word-next { color: #ff4822 !important; font-weight: 800; font-size: 36px; }
-.eon-title { color: #ff4822 !important; font-size: 42px; font-weight: 800; letter-spacing: -1.5px; margin: 12px 0 2px; }
-.eon-sub { color: #36164a !important; font-size: 18px; opacity: 0.85; margin-bottom: 15px; }
+.eon-word-eon { font-family: var(--font-display); color: var(--orange) !important; font-weight: 700; font-size: 20px; }
+.eon-word-next { font-family: var(--font-display); color: var(--orange) !important; font-weight: 700; font-size: 36px; }
+.eon-title { font-family: var(--font-display); color: var(--orange) !important; font-size: 42px; font-weight: 700; letter-spacing: -1.5px; margin: 12px 0 2px; }
+.eon-sub { color: var(--grape) !important; font-size: 18px; opacity: 0.85; margin-bottom: 15px; }
 
 /* Dashboard Grid Positioning */
 .leaderboard-grid {
@@ -35,18 +36,19 @@ body {
 }
 
 .eon-card {
-    background: #ffffff !important;
-    border-radius: 20px !important;
-    padding: 26px !important;
-    box-shadow: 0 6px 12px rgba(0,0,0,.05) !important;
+    background: var(--white) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 2.5rem !important;
+    box-shadow: var(--card-shadow) !important;
 }
 
 .eon-step {
-    color: #36164a !important; /* Purple Dark */
+    font-family: var(--font-display);
+    color: var(--grape) !important; /* Grape */
     font-weight: 700;
     font-size: 20px;
     margin-bottom: 20px;
-    border-bottom: 2px solid #faf6f4;
+    border-bottom: 2px solid var(--birch);
     padding-bottom: 10px;
 }
 
@@ -67,7 +69,7 @@ body {
 .filter-group { display: flex; align-items: center; gap: 12px; }
 .filter-group label { font-weight: 700; color: #36164a; }
 
-.last-updated { font-size: 13px; color: #7e6787; }
+.last-updated { font-size: 13px; color: var(--gray); }
 .last-updated.stale { color: #ff4822; font-weight: 700; }
 
 .timer-link {
@@ -80,7 +82,7 @@ body {
     border-radius: 100px;
     transition: 150ms;
 }
-.timer-link:hover { background: #e13d1c; }
+.timer-link:hover { background: var(--orange-hover); }
 .presentation-link { background: #36164a; }
 .presentation-link:hover { background: #2a1139; }
 
@@ -89,7 +91,7 @@ body {
 .reveal-btn.active { background: #ff4822 !important; color: #fff !important; border-color: #ff4822 !important; }
 
 /* Pre-reveal suspense state */
-.pending { font-weight: 700; color: #7e6787; }
+.pending { font-weight: 700; color: var(--gray); }
 .pending.ready { color: #ff4822; }
 
 /* Dramatic reveal: rows rise & fade in, ranked from the bottom up */
@@ -128,18 +130,18 @@ select {
     font-size: 15px !important;
     outline: none;
 }
-select:disabled { background: #f6f0ed !important; color: #7e6787 !important; cursor: not-allowed; }
+select:disabled { background: #f6f0ed !important; color: var(--gray) !important; cursor: not-allowed; }
 
 /* Standings Displays */
 .leaderboard-table { width: 100%; border-collapse: collapse; }
 .leaderboard-table th, .leaderboard-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f6f0ed; }
-.leaderboard-table th { background-color: #faf6f4; font-weight: 700; color: #7e6787; text-transform: uppercase; font-size: 0.75rem; }
+.leaderboard-table th { background-color: #faf6f4; font-weight: 700; color: var(--gray); text-transform: uppercase; font-size: 0.75rem; }
 
 /* Highlight Winner Podium Spot */
 .leaderboard-table tr:nth-child(2) { background-color: rgba(255, 72, 34, 0.05); font-weight: 700; }
 .leaderboard-table tr:nth-child(2) td:first-child { color: #ff4822; }
 
-.loading { text-align: center; color: #7e6787; font-style: italic; padding: 20px 0; }
+.loading { text-align: center; color: var(--gray); font-style: italic; padding: 20px 0; }
 
 /* Visited-stall name pills (replace the bare letter codes) */
 .stall-pill {
@@ -152,8 +154,8 @@ select:disabled { background: #f6f0ed !important; color: #7e6787 !important; cur
     color: #ffffff;
     white-space: nowrap;
 }
-.stall-pill.orange { background: #ff4822; }
-.stall-pill.purple { background: #36164a; }
+.stall-pill.orange { background: var(--orange); }
+.stall-pill.purple { background: var(--windsor); }
 .stall-none { color: #b3a6bb; font-weight: 700; }
 
 /* Stalls Badge */

@@ -6,10 +6,10 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --purple: #36164a;
-    --vivid: #5e17a0;
+    --purple: #36164a;   /* Grape */
+    --vivid: #5e0d98;    /* Windsor */
     --orange: #ff4822;
-    --cream: #faf6f4;
+    --cream: #faf6f4;    /* Birch */
 }
 
 html, body {
@@ -17,7 +17,14 @@ html, body {
     overflow: hidden;
     background: var(--cream);
     color: var(--purple);
-    font-family: "Fredoka", "Baloo 2", system-ui, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-text);
+    line-height: var(--line-height);
+}
+
+/* Headings use the display cut */
+.summer, .kicker, .hero h1, .hero .lead, .overview h2, .champion h2,
+.stall-body-title, .stall-row, .head-name, .a-title, .section-label {
+    font-family: var(--font-display);
 }
 
 /* ---------- Ambient background ---------- */

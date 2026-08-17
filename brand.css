@@ -1,0 +1,72 @@
+/* ============================================================
+   E.ON Next — brand foundation (fonts + tokens)
+   Loaded before every page's own stylesheet. Single source of truth,
+   aligned to the E.ON Next Digital Branding sheet.
+   ============================================================ */
+
+/* --- Display / Headings --- */
+@font-face {
+    font-family: 'HaasGrotDisplay';
+    src: url('fonts/HaasGrot-Disp-Regular.woff') format('woff');
+    font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'HaasGrotDisplay';
+    src: url('fonts/HaasGrot-Disp-Italic.woff') format('woff');
+    font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+    font-family: 'HaasGrotDisplay';
+    src: url('fonts/HaasGrot-Disp-Bold.woff') format('woff');
+    font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'HaasGrotDisplay';
+    src: url('fonts/HaasGrot-Disp-BoldItalic.woff') format('woff');
+    font-weight: 700; font-style: italic; font-display: swap;
+}
+
+/* --- Body Text --- */
+@font-face {
+    font-family: 'HaasGrotText';
+    src: url('fonts/HaasGrot-Text-Regular.woff') format('woff');
+    font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'HaasGrotText';
+    src: url('fonts/HaasGrot-Text-Italic.woff') format('woff');
+    font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+    font-family: 'HaasGrotText';
+    src: url('fonts/HaasGrot-Text-Bold.woff') format('woff');
+    font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'HaasGrotText';
+    src: url('fonts/HaasGrot-Text-BoldItalic.woff') format('woff');
+    font-weight: 700; font-style: italic; font-display: swap;
+}
+
+:root {
+    /* Core palette */
+    --orange:        #ff4822;
+    --orange-hover:  #e6411f;
+    --windsor:       #5e0d98;  /* feature banners, secondary headings */
+    --grape:         #36164a;  /* body text, card headings */
+    --birch:         #faf6f4;  /* global background */
+    --white:         #ffffff;
+    --gray:          #7e6886;  /* paragraph text in cards */
+
+    /* Radii */
+    --radius-md:     1rem;     /* cards, banners */
+    --radius-xl:     2.5rem;   /* pill buttons */
+
+    /* Type */
+    --font-display:  'HaasGrotDisplay', "Helvetica Neue", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    --font-text:     'HaasGrotText', "Helvetica Neue", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    --line-height:   1.5;
+
+    /* Branded card shadow */
+    --card-shadow:   0 10px 30px rgba(54, 22, 74, 0.05);
+}

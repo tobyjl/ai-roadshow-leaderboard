@@ -9,10 +9,13 @@ html, body {
     margin: 0;
     height: 100%;
     overflow: hidden;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: #faf6f4;
-    color: #36164a;
+    font-family: var(--font-text);
+    background: var(--birch);
+    color: var(--grape);
 }
+
+/* Big timer type uses the display cut */
+.phase-label, .clock, .timer-header-title, .side-title, .phase-sub { font-family: var(--font-display); }
 
 /* Phase-driven background themes (smoothly transitioned) */
 body {
@@ -318,7 +321,7 @@ body.phase-idle .ctrl-primary { background: #36164a; color: #fff; border-color: 
     font-size: clamp(14px, 2vh, 20px);
 }
 .leaderboard-table th {
-    color: #7e6787;
+    color: var(--gray);
     text-transform: uppercase;
     font-size: clamp(10px, 1.3vh, 13px);
     letter-spacing: 0.5px;
@@ -343,14 +346,14 @@ body.phase-idle .ctrl-primary { background: #36164a; color: #fff; border-color: 
     color: #ffffff;
     white-space: nowrap;
 }
-.stall-pill.orange { background: #ff4822; }
-.stall-pill.purple { background: #36164a; }
+.stall-pill.orange { background: var(--orange); }
+.stall-pill.purple { background: var(--windsor); }
 .stall-none { color: #b3a6bb; font-weight: 700; }
-.loading { text-align: center; color: #7e6787; font-style: italic; padding: 20px 0; }
+.loading { text-align: center; color: var(--gray); font-style: italic; padding: 20px 0; }
 .side-updated {
     margin-top: 12px;
     font-size: clamp(11px, 1.4vh, 14px);
-    color: #7e6787;
+    color: var(--gray);
     text-align: right;
 }
 .side-updated.stale { color: #ff4822; font-weight: 700; }
@@ -376,7 +379,7 @@ body.phase-idle .ctrl-primary { background: #36164a; color: #fff; border-color: 
 }
 
 /* Suspense state on the side board */
-.pending { font-weight: 700; color: #7e6787; }
+.pending { font-weight: 700; color: var(--gray); }
 .pending.ready { color: #ff4822; }
 
 /* ---------- Full-screen flash on phase change ---------- */
