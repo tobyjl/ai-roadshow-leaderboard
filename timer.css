@@ -96,7 +96,6 @@ body.phase-idle .header-btn { border-color: rgba(54,22,74,0.25); background: rgb
     font-weight: 800;
     letter-spacing: -1px;
     line-height: 1;
-    text-transform: uppercase;
 }
 .phase-sub {
     margin-top: 8px;

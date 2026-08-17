@@ -44,7 +44,7 @@ function heroSlide() {
     return `<section class="slide hero">
         <div class="summer reveal-up">Summer '26</div>
         <h1 class="reveal-up" style="animation-delay:.1s">AI<br><span class="orange">Roadshow</span></h1>
-        <div class="lead reveal-up" style="animation-delay:.3s">Welcome to the Circuit</div>
+        <div class="lead reveal-up" style="animation-delay:.3s">Welcome to the circuit</div>
         <div class="sub reveal-up" style="animation-delay:.45s">Explore the future of energy, technology, and AI. Step inside to meet the tools of tomorrow.</div>
     </section>`;
 }
@@ -89,7 +89,7 @@ function stallSlide(s) {
 function championSlide() {
     return `<section class="slide champion">
         <div class="kicker reveal-up">Join the programme</div>
-        <h2 class="reveal-up" style="animation-delay:.1s">Become an <span class="orange">AI Champion</span></h2>
+        <h2 class="reveal-up" style="animation-delay:.1s">Become an <span class="orange">AI champion</span></h2>
         <div class="sub reveal-up" style="animation-delay:.25s">The next session starts soon — grab a team and get on the circuit.</div>
         <img class="logo reveal-up" src="eon_next_logo.png" alt="E.ON Next" style="animation-delay:.4s" onerror="this.style.display='none'">
     </section>`;

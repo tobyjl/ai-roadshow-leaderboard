@@ -21,14 +21,14 @@ let hideTests = localStorage.getItem('hideTests') !== 'false';
 
 function syncTestToggle() {
     testToggleBtn.classList.toggle('active', hideTests);
-    testToggleBtn.innerText = hideTests ? '🧹 Hide Test Entries' : '👁 Show Test Entries';
+    testToggleBtn.innerText = hideTests ? '🧹 Hide test entries' : '👁 Show test entries';
 }
 
 // isRevealed / setRevealed live in schedule.js (shared with the timer page).
 function syncRevealBtn() {
     const revealed = isRevealed(sessionSelect.value);
     revealBtn.classList.toggle('active', revealed);
-    revealBtn.innerText = revealed ? '🙈 Hide Scores Again' : '🎭 Reveal Scores';
+    revealBtn.innerText = revealed ? '🙈 Hide scores again' : '🎭 Reveal scores';
 }
 
 function formatTime(date) {
@@ -43,7 +43,7 @@ function generateTableHTML(dataList) {
     }
 
     let html = '<table class="leaderboard-table">';
-    html += '<tr><th>Rank</th><th>Team Name</th><th>Score</th><th>Stalls</th></tr>';
+    html += '<tr><th>Rank</th><th>Team name</th><th>Score</th><th>Stalls</th></tr>';
 
     dataList.forEach((item, index) => {
         html += `<tr>
@@ -70,7 +70,7 @@ function generateSessionHTML(dataList, revealed, animate) {
         const active = dataList.filter(t => !t.complete).sort((a, b) => b.score - a.score);
         const locked = dataList.filter(t => t.complete).sort((a, b) => a.name.localeCompare(b.name));
         let html = '<table class="leaderboard-table">';
-        html += '<tr><th>Team Name</th><th>Score</th><th>Stalls</th></tr>';
+        html += '<tr><th>Team name</th><th>Score</th><th>Stalls</th></tr>';
         [...active, ...locked].forEach(item => {
             const scoreCell = item.complete
                 ? '<span class="pending ready">🔒 Locked in</span>'
@@ -88,7 +88,7 @@ function generateSessionHTML(dataList, revealed, animate) {
     // Revealed — ranked scoreboard, optionally animated in.
     const ranked = [...dataList].sort((a, b) => b.score - a.score);
     let html = `<table class="leaderboard-table${animate ? ' revealing' : ''}">`;
-    html += '<tr><th>Rank</th><th>Team Name</th><th>Score</th><th>Stalls</th></tr>';
+    html += '<tr><th>Rank</th><th>Team name</th><th>Score</th><th>Stalls</th></tr>';
     ranked.forEach((item, index) => {
         const delay = animate ? ` style="animation-delay:${index * 0.45}s"` : '';
         const scoreCell = animate
@@ -212,11 +212,11 @@ autoToggleBtn.addEventListener('click', () => {
     isAutoMode = !isAutoMode;
     if (isAutoMode) {
         autoToggleBtn.classList.add('active');
-        autoToggleBtn.innerText = "🔄 Auto-Detect Session";
+        autoToggleBtn.innerText = "🔄 Auto-detect session";
         sessionSelect.disabled = true;
     } else {
         autoToggleBtn.classList.remove('active');
-        autoToggleBtn.innerText = "🖐️ Manual Selection";
+        autoToggleBtn.innerText = "🖐️ Manual selection";
         sessionSelect.disabled = false;
     }
     processLeaderboards();
