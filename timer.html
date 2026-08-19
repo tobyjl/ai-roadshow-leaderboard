@@ -17,6 +17,7 @@
             <img src="eon_next_logo.png" alt="E.ON Next" class="timer-logo" onerror="this.style.display='none'">
             <div class="timer-header-title">Roadshow live</div>
             <div class="timer-header-actions">
+                <button id="reveal-btn" class="header-btn reveal-header-btn">🎭 Reveal scores</button>
                 <button id="voice-btn" class="header-btn">🔊 Voice on</button>
                 <a href="presentation.html" class="header-btn">🎬 Presentation</a>
             </div>
@@ -67,6 +68,17 @@
                 <div id="side-updated" class="side-updated">Last updated: —</div>
             </aside>
         </main>
+    </div>
+
+    <!-- Full-screen dramatic reveal -->
+    <div id="reveal-overlay" class="reveal-overlay">
+        <button id="reveal-close" class="reveal-close" title="Close">✕</button>
+        <div class="reveal-inner">
+            <div id="reveal-kicker" class="reveal-kicker">Session results</div>
+            <div class="reveal-heading">The results are in!</div>
+            <div id="reveal-list" class="reveal-list"></div>
+            <button id="reveal-unhide" class="reveal-unhide">Hide scores again</button>
+        </div>
     </div>
 
     <script src="schedule.js"></script>

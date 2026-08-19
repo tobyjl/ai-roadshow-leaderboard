@@ -228,8 +228,9 @@ function updateDisplay() {
     renderMissingFlag();
 }
 
-// Per-team codes for the active session, kept fresh by refreshBoard() below.
+// Per-team data for the active session, kept fresh by refreshBoard() below.
 let sessionCodes = {};
+let sessionTeams = [];
 let lastMissingHtml = null;
 
 // Flag teams that should have a stall scored by now (based on completed rounds) but don't.
@@ -384,7 +385,9 @@ startBtn.addEventListener('click', toggle);
 resetBtn.addEventListener('click', reset);
 skipBtn.addEventListener('click', skip);
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') { e.preventDefault(); toggle(); }
+    // Ignore the start/pause shortcut while the reveal overlay is up.
+    const overlayUp = document.getElementById('reveal-overlay').classList.contains('show');
+    if (e.code === 'Space' && !overlayUp) { e.preventDefault(); toggle(); }
 });
 
 // Voice announcements toggle
@@ -400,6 +403,103 @@ voiceBtn.addEventListener('click', () => {
     syncVoiceBtn();
 });
 syncVoiceBtn();
+
+// ============================================================
+//  Dramatic reveal (from the timer / hall screen)
+// ============================================================
+const revealBtn      = document.getElementById('reveal-btn');
+const revealOverlay  = document.getElementById('reveal-overlay');
+const revealCloseBtn = document.getElementById('reveal-close');
+const revealUnhide   = document.getElementById('reveal-unhide');
+const revealListEl   = document.getElementById('reveal-list');
+const revealKicker   = document.getElementById('reveal-kicker');
+
+function currentSessionString() { return getActiveSlot().sessionString; }
+
+function syncRevealBtn() {
+    if (!revealBtn) return;
+    const revealed = isRevealed(currentSessionString());
+    revealBtn.textContent = revealed ? '🎭 Show results' : '🎭 Reveal scores';
+    revealBtn.classList.toggle('revealed', revealed);
+}
+
+function countUp(el, target) {
+    const start = performance.now();
+    const duration = 1100;
+    function frame(now) {
+        const t = Math.min(1, (now - start) / duration);
+        el.textContent = Math.round((1 - Math.pow(1 - t, 3)) * target);
+        if (t < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+}
+
+function buildRevealList() {
+    const active = getActiveSlot();
+    revealKicker.textContent = `Day ${active.dayNum} · Session ${active.sessionNum} results`;
+
+    const teams = [...sessionTeams];
+    if (teams.length === 0) {
+        revealListEl.innerHTML = '<div class="reveal-empty">No scores recorded for this session yet.</div>';
+        return;
+    }
+
+    const ranked = teams.sort((a, b) => b.score - a.score);
+    const stagger = 0.7; // seconds between rows
+    revealListEl.innerHTML = ranked.map((item, i) => {
+        // Reveal bottom-up so #1 lands last for suspense.
+        const delay = (ranked.length - 1 - i) * stagger;
+        const crown = i === 0 ? '👑 ' : '';
+        const warn = scoreIssues(item.score, item.stalls).length ? ' <span class="warn">⚠</span>' : '';
+        return `<div class="reveal-row rank-${i + 1}" style="animation-delay:${delay}s">
+            <span class="reveal-rank">#${i + 1}</span>
+            <span class="reveal-name">${crown}${item.name}</span>
+            <span class="reveal-score"><strong class="ru" data-target="${item.score}">0</strong> / 40${warn}</span>
+        </div>`;
+    }).join('');
+
+    // Kick off each count-up as its row finishes rising in.
+    revealListEl.querySelectorAll('.reveal-row').forEach((row, i) => {
+        const delay = (ranked.length - 1 - i) * stagger;
+        const el = row.querySelector('.ru');
+        setTimeout(() => countUp(el, parseInt(el.dataset.target, 10) || 0), delay * 1000 + 350);
+    });
+}
+
+function openReveal(withFanfare) {
+    buildRevealList();
+    revealOverlay.classList.add('show');
+    if (withFanfare) {
+        ensureAudio();
+        playChime('finish');
+        setTimeout(() => speak('And the results are in!'), 300);
+    }
+}
+
+function closeReveal() { revealOverlay.classList.remove('show'); }
+
+revealBtn.addEventListener('click', () => {
+    const session = currentSessionString();
+    if (isRevealed(session)) {
+        openReveal(true);            // already revealed → replay the moment
+    } else {
+        setRevealed(session, true);  // reveal + flow to leaderboard/all-time
+        sideContainer.innerHTML = renderBoard(sessionTeams, true);
+        syncRevealBtn();
+        openReveal(true);
+    }
+});
+revealCloseBtn.addEventListener('click', closeReveal);
+revealUnhide.addEventListener('click', () => {
+    setRevealed(currentSessionString(), false);
+    sideContainer.innerHTML = renderBoard(sessionTeams, false);
+    syncRevealBtn();
+    closeReveal();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && revealOverlay.classList.contains('show')) closeReveal();
+});
+syncRevealBtn();
 
 // ============================================================
 //  Live "Current Session" leaderboard (mirrors the main board)
@@ -510,9 +610,11 @@ function refreshBoard() {
                 }
             });
             sessionCodes = codesByName;
+            sessionTeams = teams;
             sideContainer.innerHTML = renderBoard(teams, isRevealed(target));
             renderMissingFlag();
             renderScoreFlag(teams);
+            syncRevealBtn();
 
             lastBoardSuccess = new Date();
             sideUpdated.textContent = `Last updated: ${clockTime(lastBoardSuccess)}`;

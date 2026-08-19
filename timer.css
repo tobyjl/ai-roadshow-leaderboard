@@ -71,6 +71,87 @@ body.phase-finished { background: radial-gradient(circle at 30% 20%, #2f9e6f 0%,
 .header-btn.off { opacity: 0.6; }
 /* On the light idle background the header text is dark */
 body.phase-idle .header-btn { border-color: rgba(54,22,74,0.25); background: rgba(54,22,74,0.05); }
+/* Reveal is the showtime control — always orange, on any background */
+.reveal-header-btn, body.phase-idle .reveal-header-btn {
+    background: var(--orange); color: #fff; border-color: var(--orange);
+}
+.reveal-header-btn:hover { background: var(--orange-hover); }
+.reveal-header-btn.revealed, body.phase-idle .reveal-header-btn.revealed {
+    background: transparent; color: currentColor; border-color: currentColor;
+}
+
+/* ---------- Dramatic full-screen reveal ---------- */
+.reveal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(24px, 5vh, 64px);
+    background: radial-gradient(circle at 30% 15%, #4a2263 0%, #36164a 70%);
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms ease;
+}
+.reveal-overlay.show { opacity: 1; pointer-events: auto; }
+.reveal-close {
+    position: absolute; top: clamp(16px, 3vh, 28px); right: clamp(16px, 3vw, 32px);
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,0.14); color: #fff; border: none;
+    font-size: 22px; font-weight: 700; cursor: pointer; transition: 150ms;
+}
+.reveal-close:hover { background: rgba(255,255,255,0.28); }
+.reveal-inner { width: 100%; max-width: 1100px; text-align: center; }
+.reveal-kicker {
+    font-family: var(--font-display);
+    color: var(--orange); font-weight: 700;
+    font-size: clamp(16px, 2.4vh, 26px); letter-spacing: 0.5px; margin-bottom: 6px;
+}
+.reveal-heading {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(34px, 6.5vh, 84px); letter-spacing: -1px; line-height: 1;
+    margin-bottom: clamp(20px, 4vh, 48px);
+}
+.reveal-list { display: flex; flex-direction: column; gap: clamp(8px, 1.4vh, 16px); }
+.reveal-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: clamp(12px, 2vw, 28px);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 18px;
+    padding: clamp(12px, 2vh, 22px) clamp(18px, 2.6vw, 36px);
+    opacity: 0;
+    animation: revealPop 0.6s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+@keyframes revealPop {
+    from { opacity: 0; transform: translateY(26px) scale(0.96); }
+    to   { opacity: 1; transform: none; }
+}
+.reveal-rank { font-family: var(--font-display); font-weight: 700; opacity: 0.7; font-size: clamp(18px, 3vh, 34px); }
+.reveal-name { font-family: var(--font-display); font-weight: 700; text-align: left; font-size: clamp(20px, 3.4vh, 44px); }
+.reveal-score { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 3.4vh, 44px); white-space: nowrap; }
+.reveal-score .warn { color: #ffb3a0; font-size: 0.7em; }
+/* Winner podium */
+.reveal-row.rank-1 {
+    background: var(--orange);
+    border-color: var(--orange);
+    box-shadow: 0 12px 40px rgba(255,72,34,0.35);
+    padding-top: clamp(16px, 2.6vh, 30px); padding-bottom: clamp(16px, 2.6vh, 30px);
+}
+.reveal-row.rank-1 .reveal-rank { opacity: 1; }
+.reveal-row.rank-1 .reveal-name { font-size: clamp(24px, 4.4vh, 58px); }
+.reveal-row.rank-1 .reveal-score { font-size: clamp(24px, 4.4vh, 58px); }
+.reveal-unhide {
+    margin-top: clamp(20px, 4vh, 40px);
+    background: none; border: none; color: rgba(255,255,255,0.6);
+    font-family: var(--font-text); font-size: 15px; cursor: pointer; text-decoration: underline;
+}
+.reveal-unhide:hover { color: #fff; }
+.reveal-empty { font-size: clamp(18px, 3vh, 30px); opacity: 0.8; }
 
 .timer-main {
     flex: 1 1 auto;
