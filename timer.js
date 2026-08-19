@@ -44,6 +44,7 @@ const flashEl     = document.getElementById('flash-overlay');
 const journeyEl   = document.getElementById('journey');
 const assignEl    = document.getElementById('assignments');
 const missingEl   = document.getElementById('missing-flag');
+const scoreFlagEl = document.getElementById('score-flag');
 
 // ============================================================
 //  Time helpers
@@ -416,6 +417,12 @@ function clockTime(d) {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
+function scoreCellHTML(item) {
+    const warn = scoreIssues(item.score, item.stalls).length ? ' ⚠' : '';
+    const cls = warn ? ' class="score-warn"' : '';
+    return `<td${cls}><strong>${item.score}</strong> / 40${warn}</td>`;
+}
+
 function renderBoard(rows, revealed) {
     if (rows.length === 0) {
         return '<p class="loading">No scores recorded for this session yet.</p>';
@@ -428,12 +435,13 @@ function renderBoard(rows, revealed) {
         const locked = [...rows].filter(t => t.complete).sort((a, b) => a.name.localeCompare(b.name));
         let html = '<table class="leaderboard-table"><tr><th>Team</th><th>Score</th><th>Stalls</th></tr>';
         [...active, ...locked].forEach(item => {
+            const anomaly = scoreIssues(item.score, item.stalls).length;
             const scoreCell = item.complete
-                ? '<span class="pending ready">🔒 Locked in</span>'
-                : `<strong>${item.score}</strong> / 40`;
+                ? `<td><span class="pending ready">🔒 Locked in</span>${anomaly ? ' <span class="score-warn">⚠</span>' : ''}</td>`
+                : scoreCellHTML(item);
             html += `<tr>
                 <td>${item.name}</td>
-                <td>${scoreCell}</td>
+                ${scoreCell}
                 <td>${stallPillsHTML(item.codes)}</td>
             </tr>`;
         });
@@ -446,11 +454,32 @@ function renderBoard(rows, revealed) {
         html += `<tr>
             <td>#${i + 1}</td>
             <td>${item.name}</td>
-            <td><strong>${item.score}</strong> / 40</td>
+            ${scoreCellHTML(item)}
             <td>${stallPillsHTML(item.codes)}</td>
         </tr>`;
     });
     return html + '</table>';
+}
+
+// Always-on operator check: flag teams whose total can't be right for the
+// stalls they've visited (double-count / over-score), even when scores are hidden.
+let lastScoreHtml = null;
+function renderScoreFlag(rows) {
+    if (!scoreFlagEl) return;
+    const flagged = rows
+        .map(t => ({ name: t.name, issues: scoreIssues(t.score, t.stalls) }))
+        .filter(t => t.issues.length);
+
+    const html = flagged.length === 0
+        ? ''
+        : `<div class="missing-title">⚠ Check scores</div>` +
+          flagged.map(f => `<div class="missing-item">${f.name} · <strong>${f.issues.join(', ')}</strong></div>`).join('');
+
+    if (html !== lastScoreHtml) {
+        scoreFlagEl.innerHTML = html;
+        scoreFlagEl.classList.toggle('has-missing', flagged.length > 0);
+        lastScoreHtml = html;
+    }
 }
 
 function refreshBoard() {
@@ -483,6 +512,7 @@ function refreshBoard() {
             sessionCodes = codesByName;
             sideContainer.innerHTML = renderBoard(teams, isRevealed(target));
             renderMissingFlag();
+            renderScoreFlag(teams);
 
             lastBoardSuccess = new Date();
             sideUpdated.textContent = `Last updated: ${clockTime(lastBoardSuccess)}`;

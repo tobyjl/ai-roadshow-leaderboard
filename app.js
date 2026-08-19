@@ -37,6 +37,11 @@ function formatTime(date) {
 
 // Session detection and cleanField now live in schedule.js (shared with the timer).
 
+// A ⚠ marker when a total exceeds what's possible for the stalls visited.
+function scoreWarn(item) {
+    return scoreIssues(item.score, item.stalls).length ? ' <span class="score-warn">⚠</span>' : '';
+}
+
 function generateTableHTML(dataList) {
     if (dataList.length === 0) {
         return '<p class="loading">No event scores recorded here yet.</p>';
@@ -49,7 +54,7 @@ function generateTableHTML(dataList) {
         html += `<tr>
                     <td>#${index + 1}</td>
                     <td>${item.name}</td>
-                    <td><strong>${item.score}</strong> / 40</td>
+                    <td><strong>${item.score}</strong> / 40${scoreWarn(item)}</td>
                     <td>${stallPillsHTML(item.codes)}</td>
                  </tr>`;
     });
@@ -73,8 +78,8 @@ function generateSessionHTML(dataList, revealed, animate) {
         html += '<tr><th>Team name</th><th>Score</th><th>Stalls</th></tr>';
         [...active, ...locked].forEach(item => {
             const scoreCell = item.complete
-                ? '<span class="pending ready">🔒 Locked in</span>'
-                : `<strong>${item.score}</strong> / 40`;
+                ? `<span class="pending ready">🔒 Locked in</span>${scoreWarn(item)}`
+                : `<strong>${item.score}</strong> / 40${scoreWarn(item)}`;
             html += `<tr>
                         <td>${item.name}</td>
                         <td>${scoreCell}</td>
@@ -92,8 +97,8 @@ function generateSessionHTML(dataList, revealed, animate) {
     ranked.forEach((item, index) => {
         const delay = animate ? ` style="animation-delay:${index * 0.45}s"` : '';
         const scoreCell = animate
-            ? `<strong class="countup" data-target="${item.score}">0</strong> / 40`
-            : `<strong>${item.score}</strong> / 40`;
+            ? `<strong class="countup" data-target="${item.score}">0</strong> / 40${scoreWarn(item)}`
+            : `<strong>${item.score}</strong> / 40${scoreWarn(item)}`;
         html += `<tr${delay}>
                     <td>#${index + 1}</td>
                     <td>${item.name}</td>

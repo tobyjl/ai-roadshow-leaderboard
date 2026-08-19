@@ -158,6 +158,9 @@ select:disabled { background: #f6f0ed !important; color: var(--gray) !important;
 .stall-pill.purple { background: var(--windsor); }
 .stall-none { color: #b3a6bb; font-weight: 700; }
 
+/* Over-max / double-counted score warning */
+.score-warn { color: #d1420a; font-weight: 800; }
+
 /* Stalls Badge */
 .stall-badge {
     background-color: #faf6f4;

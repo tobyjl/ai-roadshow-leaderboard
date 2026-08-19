@@ -357,14 +357,22 @@ body.phase-idle .ctrl-primary { background: #36164a; color: #fff; border-color: 
 }
 .side-updated.stale { color: #ff4822; font-weight: 700; }
 
-/* Missing-scores flag */
-.missing-flag { margin-bottom: 12px; }
-.missing-flag.has-missing {
+/* Operator flags (missing scores, score anomalies) */
+.missing-flag, .score-flag { margin-bottom: 12px; }
+.missing-flag.has-missing, .score-flag.has-missing {
     background: #fff3f0;
     border: 1px solid #ffb7a6;
     border-radius: 12px;
     padding: 10px 14px;
 }
+/* The score-check flag is a harder warning — amber to stand apart from missing */
+.score-flag.has-missing {
+    background: #fff7e6;
+    border-color: #ffcf80;
+}
+.score-flag .missing-title { color: #b8730a; }
+.score-flag .missing-item { color: #7a5100; }
+.score-warn { color: #d1420a; font-weight: 800; }
 .missing-title {
     font-weight: 800;
     color: #ff4822;

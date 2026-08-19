@@ -149,10 +149,30 @@ function stallPillsHTML(codes) {
         .join('');
 }
 
-// Parse "C, H, N" → ['C','H','N'] (upper-cased, de-duped).
+// Parse "C, H, N" → ['C','H','N'] exactly as logged (keeps duplicates).
+function parseVisitedRaw(str) {
+    return cleanField(str).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+}
+
+// De-duplicated visited codes (used for progress / completeness).
 function parseVisited(str) {
-    const seen = cleanField(str).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
-    return [...new Set(seen)];
+    return [...new Set(parseVisitedRaw(str))];
+}
+
+// Each stall is worth up to 10, so a team's cap is 10 × (unique stalls visited),
+// maxing at 40. Anything above that — or a repeated stall code — points to a
+// double-count / over-score that a scorer should fix in the sheet.
+const POINTS_PER_STALL = 10;
+const MAX_SCORE = 40;
+
+function scoreIssues(score, stallsStr) {
+    const raw = parseVisitedRaw(stallsStr);
+    const uniq = new Set(raw);
+    const cap = uniq.size * POINTS_PER_STALL;
+    const issues = [];
+    if (raw.length > uniq.size) issues.push('duplicate stall entry');
+    if (score > cap) issues.push(`${score} pts, max ${cap}`);
+    return issues;
 }
 
 // True once a team has visited all four stalls.
